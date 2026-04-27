@@ -1,0 +1,17 @@
+"ObjectId"," Parent"," Enabled"," Expression"," ExpressionComment","DAX"
+"CH01","ExpressionData.Definition;# of Flights","true","Sum ([# Departures Performed])","","'# of Flights' = SUM('Main Data'[# Departures Performed])
+"
+"CH01","ExpressionData.Definition;# of Enplanned Passengers","true","Sum ([# Transported Passengers])","","'# of Enplanned Passengers' = SUM('Main Data'[# Transported Passengers])
+"
+"CH01","ExpressionData.Definition;Transported Freight","true","Sum ([# Transported Freight])","","'Total Transported Freight' = SUM('Main Data'[# Transported Freight])
+"
+"CH01","ExpressionData.Definition;Transported Mail","true","Sum ([# Transported Mail])","","'Total Transported Mail' = SUM('Main Data'[# Transported Mail])
+"
+"CH02","ExpressionData.Definition;Flights","true","Sum ([# Departures Performed])","","'Total Departures Performed' = SUM('Main Data'[# Departures Performed])
+"
+"CH02","ExpressionData.Definition;Passengers","true","Sum ([# Transported Passengers])","","'Total Transported Passengers' = SUM('Main Data'[# Transported Passengers])
+"
+"CH02","ExpressionData.Definition;Freight","true","Sum ([# Transported Freight])","","'Total Transported Freight' = SUM('Main Data'[# Transported Freight])
+"
+"CH02","ExpressionData.Definition;Mail","true","Sum ([# Transported Mail])","","'Total Transported Mail' = SUM('Main Data'[# Transported Mail])
+"

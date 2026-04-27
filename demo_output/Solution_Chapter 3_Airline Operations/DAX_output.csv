@@ -1,0 +1,16 @@
+"measure '# of Flights' = SUM('Main Data'[# Departures Performed])
+    displayFolder: $_measure"
+"measure '# of Enplanned Passengers' = SUM('Main Data'[# Transported Passengers])
+    displayFolder: $_measure"
+"measure 'Total Transported Freight' = SUM('Main Data'[# Transported Freight])
+    displayFolder: $_measure"
+"measure 'Total Transported Mail' = SUM('Main Data'[# Transported Mail])
+    displayFolder: $_measure"
+"measure 'Total Departures Performed' = SUM('Main Data'[# Departures Performed])
+    displayFolder: $_measure"
+"measure 'Total Transported Passengers' = SUM('Main Data'[# Transported Passengers])
+    displayFolder: $_measure"
+"measure 'Total Transported Freight' = SUM('Main Data'[# Transported Freight])
+    displayFolder: $_measure"
+"measure 'Total Transported Mail' = SUM('Main Data'[# Transported Mail])
+    displayFolder: $_measure"

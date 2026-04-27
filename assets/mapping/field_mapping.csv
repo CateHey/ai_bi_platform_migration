@@ -1,0 +1,93 @@
+﻿BaseFileName,ObjectType,PowerBIObjectType,IsRelevant,Relevance,relevant_field
+CH,Chart,Visualization,TRUE,Alignment,GraphProperties_GraphLayout_Frame_Rect_Left
+CH,Chart,Visualization,TRUE,Alignment,GraphProperties_GraphLayout_Frame_Rect_Top
+CH,Chart,Visualization,TRUE,Size,GraphProperties_GraphLayout_Frame_Rect_Width
+CH,Chart,Visualization,TRUE,Size,GraphProperties_GraphLayout_Frame_Rect_Height
+CH,Chart,Visualization,TRUE,Title Text,GraphProperties_GraphLayout_WindowTitle_v
+CH,Chart,Visualization,TRUE,Chart Type,GraphProperties_GraphLayout_GraphMode
+CH,Chart,Visualization,TRUE,DAX Measure,GraphProperties_ExpressionDatas_ExpressionData_Definition_v
+CH,Chart,Visualization,TRUE,Dimension,GraphProperties_Dimensions_ChartDimensionDataDef_PseudoDef_Name
+BM,Bookmark,Bookmark,TRUE,Alignment,BookmarkObjectProperties_Layout_Frame_Rect_Left
+BM,Bookmark,Bookmark,TRUE,Alignment,BookmarkObjectProperties_Layout_Frame_Rect_Top
+BM,Bookmark,Bookmark,TRUE,Size,BookmarkObjectProperties_Layout_Frame_Rect_Width
+BM,Bookmark,Bookmark,TRUE,Size,BookmarkObjectProperties_Layout_Frame_Rect_Height
+BU,Button,Button,TRUE,Alignment,Frame_Rect_Left
+BU,Button,Button,TRUE,Alignment,Frame_Rect_Top
+BU,Button,Button,TRUE,Size,Frame_Rect_Width
+BU,Button,Button,TRUE,Size,Frame_Rect_Height
+BU,Button,Button,TRUE,Title Text,Text_v
+BU,Button,Button,TRUE,Action,ActionItems_ActionItemDef_Type
+CS,Current Selections,Filter Pane Summary,TRUE,Alignment,CurrentSelectionProperties_Layout_Frame_Rect_Left
+CS,Current Selections,Filter Pane Summary,TRUE,Alignment,CurrentSelectionProperties_Layout_Frame_Rect_Top
+CS,Current Selections,Filter Pane Summary,TRUE,Size,CurrentSelectionProperties_Layout_Frame_Rect_Width
+CS,Current Selections,Filter Pane Summary,TRUE,Size,CurrentSelectionProperties_Layout_Frame_Rect_Height
+CT,Container Object,Group/Container,TRUE,Id of Object in Container,ContainerProperties_ContainedObjects_ContainerItemDef[0]_Id_OBSOLETE
+CT,Container Object,Group/Container,TRUE,Alignment,ContainerProperties_ContainedObjects_ContainerItemDef[0]_Def_Rect_Left
+CT,Container Object,Group/Container,TRUE,Alignment,ContainerProperties_ContainedObjects_ContainerItemDef[0]_Def_Rect_Top
+CT,Container Object,Group/Container,TRUE,Size,ContainerProperties_ContainedObjects_ContainerItemDef[0]_Def_Rect_Width
+CT,Container Object,Group/Container,TRUE,Size,ContainerProperties_ContainedObjects_ContainerItemDef[0]_Def_Rect_Height
+IB,Input Box,What-If Parameter,TRUE,Title Text,InputBoxProperties_Layout_Frame_Name_v
+IB,Input Box,What-If Parameter,TRUE,Alignment,InputBoxProperties_Layout_Frame_Rect_Left
+IB,Input Box,What-If Parameter,TRUE,Alignment,InputBoxProperties_Layout_Frame_Rect_Top
+IB,Input Box,What-If Parameter,TRUE,Size,InputBoxProperties_Layout_Frame_Rect_Width
+IB,Input Box,What-If Parameter,TRUE,Size,InputBoxProperties_Layout_Frame_Rect_Height
+IB,Input Box,What-If Parameter,TRUE,Label Text,InputBoxProperties_Layout_MemberAttributes_LInputBoxMemberAttributes_Label_v
+IB,Input Box,What-If Parameter,TRUE,Variable,InputBoxProperties_Layout_MemberAttributes_LInputBoxMemberAttributes_Name_v
+LB,ListBox,Slicer,TRUE,Alignment,ListBoxProperties_Layout_Frame_Rect_Left
+LB,ListBox,Slicer,TRUE,Alignment,ListBoxProperties_Layout_Frame_Rect_Top
+LB,ListBox,Slicer,TRUE,Size,ListBoxProperties_Layout_Frame_Rect_Width
+LB,ListBox,Slicer,TRUE,Size,ListBoxProperties_Layout_Frame_Rect_Height
+LB,ListBox,Slicer,TRUE,Dimension,ListBoxProperties_Def_Name
+MB,MultiBox,Slicer,TRUE,Alignment,MultiBoxProperties_Layout_Frame_Rect_Left
+MB,MultiBox,Slicer,TRUE,Alignment,MultiBoxProperties_Layout_Frame_Rect_Top
+MB,MultiBox,Slicer,TRUE,Size,MultiBoxProperties_Layout_Frame_Rect_Width
+MB,MultiBox,Slicer,TRUE,Size,MultiBoxProperties_Layout_Frame_Rect_Height
+MB,MultiBox,Slicer,TRUE,Dimension,MultiBoxProperties_MemberAttributes_MultiBoxMemberAttributes[0]_FieldDef_Name
+SB,Statistics Box,Card/KPI,TRUE,Field,StatisticsBoxProperties_FieldDef_Name
+SB,Statistics Box,Card/KPI,TRUE,Title Text,StatisticsBoxProperties_Layout_Frame_Name_v
+SB,Statistics Box,Card/KPI,TRUE,Alignment,StatisticsBoxProperties_Layout_Frame_Rect_Left
+SB,Statistics Box,Card/KPI,TRUE,Alignment,StatisticsBoxProperties_Layout_Frame_Rect_Top
+SB,Statistics Box,Card/KPI,TRUE,Size,StatisticsBoxProperties_Layout_Frame_Rect_Width
+SB,Statistics Box,Card/KPI,TRUE,Size,StatisticsBoxProperties_Layout_Frame_Rect_Height
+SB,Statistics Box,Card/KPI,TRUE,DAX functions,StatisticsBoxProperties_Layout_LabelColumn_TextCellContent[0]_String
+SB,Statistics Box,Card/KPI,TRUE,DAX functions,StatisticsBoxProperties_Layout_LabelColumn_TextCellContent[1]_String
+SB,Statistics Box,Card/KPI,TRUE,DAX functions,StatisticsBoxProperties_Layout_LabelColumn_TextCellContent[2]_String
+SB,Statistics Box,Card/KPI,TRUE,DAX functions,StatisticsBoxProperties_Layout_LabelColumn_TextCellContent[3]_String
+SL,Slider/Calendar,Date Slicer,TRUE,Alignment,SliderProperties_Layout_Frame_Rect_Left
+SL,Slider/Calendar,Date Slicer,TRUE,Alignment,SliderProperties_Layout_Frame_Rect_Top
+SL,Slider/Calendar,Date Slicer,TRUE,Size,SliderProperties_Layout_Frame_Rect_Width
+SL,Slider/Calendar,Date Slicer,TRUE,Size,SliderProperties_Layout_Frame_Rect_Height
+SL,Slider/Calendar,Date Slicer,TRUE,Variable or Dimension,SliderProperties_Name1_Name
+SL,Slider/Calendar,Date Slicer,TRUE,Type,SliderProperties_Name1_Type
+SL,Slider/Calendar,Date Slicer,TRUE,Variable or Dimension,SliderProperties_Name2_Name
+SL,Slider/Calendar,Date Slicer,TRUE,Type,SliderProperties_Name2_Type
+SO,Search Object,Slicer,TRUE,Alignment,SearchObjectProperties_Frame_Rect_Left
+SO,Search Object,Slicer,TRUE,Alignment,SearchObjectProperties_Frame_Rect_Top
+SO,Search Object,Slicer,TRUE,Size,SearchObjectProperties_Frame_Rect_Width
+SO,Search Object,Slicer,TRUE,Size,SearchObjectProperties_Frame_Rect_Height
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[0]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[1]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[2]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[3]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[4]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[5]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[6]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[7]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[8]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[9]_Name
+SO,Search Object,Slicer,TRUE,Dimension,SearchObjectProperties_Fields_FieldDefEx[10]_Name
+TB,Table Box,Table,TRUE,Title Text,TableBoxProperties_Layout_Frame_Name_v
+TB,Table Box,Table,TRUE,Alignment,TableBoxProperties_Layout_Frame_Rect_Left
+TB,Table Box,Table,TRUE,Alignment,TableBoxProperties_Layout_Frame_Rect_Top
+TB,Table Box,Table,TRUE,Size,TableBoxProperties_Layout_Frame_Rect_Width
+TB,Table Box,Table,TRUE,Size,TableBoxProperties_Layout_Frame_Rect_Height
+TB,Table Box,Table,TRUE,Field,TableBoxProperties_Layout_ColLayouts_LTableColLayout[0]_Field_Name
+TB,Table Box,Table,TRUE,Field,TableBoxProperties_Layout_ColLayouts_LTableColLayout[1]_Field_Name
+TB,Table Box,Table,TRUE,Field,TableBoxProperties_Layout_ColLayouts_LTableColLayout[2]_Field_Name
+TB,Table Box,Table,TRUE,Field,TableBoxProperties_Layout_ColLayouts_LTableColLayout[3]_Field_Name
+TB,Table Box,Table,TRUE,Field,TableBoxProperties_Layout_ColLayouts_LTableColLayout[4]_Field_Name
+TX,Text Object,Text Box,TRUE,Alignment,TextObjectProperties_Layout_Frame_Rect_Left
+TX,Text Object,Text Box,TRUE,Alignment,TextObjectProperties_Layout_Frame_Rect_Top
+TX,Text Object,Text Box,TRUE,Size,TextObjectProperties_Layout_Frame_Rect_Width
+TX,Text Object,Text Box,TRUE,Size,TextObjectProperties_Layout_Frame_Rect_Height
+TX,Text Object,Text Box,TRUE,Text / DAX Measure,TextObjectProperties_Layout_Frame_Text_v

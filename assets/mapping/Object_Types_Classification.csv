@@ -1,0 +1,15 @@
+BaseFileName,ObjectType,PBIObjectType,Classification
+CH,Chart,Visualization,Display
+BM,Bookmark,Bookmark,Action
+BU,Button,Button,Action
+CS,Current Selections,Filter Pane Summary,Selection
+CT,Container Object,Group/Container,Styling
+IB,Input Box,What-If Parameter,Action
+LB,ListBox,Slicer,Selection
+MB,MultiBox,Slicer,Selection
+SB,Statistics Box,Card/KPI,Display
+SL,Slider/Calendar,Date Slicer,Selection
+SO,Search Object,Slicer,Selection
+TB,Table Box,Table,Display
+TX,Text Object,Text Box,Display
+LA,Line/Arrow,Shape,Styling

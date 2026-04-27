@@ -1,0 +1,100 @@
+{
+  "extract_qv_metadata": {
+    "step_name": "extract_qv_metadata",
+    "last_run": "2026-04-20 13:06:29",
+    "status": "success",
+    "duration_sec": 33.27,
+    "files": [
+      {
+        "file": "Solution_Chapter 3_Airline Operations",
+        "finished_at": "2026-04-20 13:06:59",
+        "duration_sec": 30.83,
+        "status": "success"
+      }
+    ]
+  },
+  "parse_xml": {
+    "step_name": "parse_xml",
+    "last_run": "2026-04-20 13:11:11",
+    "status": "success",
+    "duration_sec": 21.8,
+    "files": [
+      {
+        "file": "all_reports",
+        "finished_at": "2026-04-20 13:11:33",
+        "duration_sec": 21.73,
+        "status": "success"
+      }
+    ]
+  },
+  "map_fields": {
+    "step_name": "map_fields",
+    "last_run": "2026-04-20 14:38:42",
+    "status": "success",
+    "duration_sec": 1.15,
+    "files": [
+      {
+        "file": "Solution_Chapter 3_Airline Operations",
+        "finished_at": "2026-04-20 14:38:43",
+        "duration_sec": 1.14,
+        "status": "success"
+      }
+    ]
+  },
+  "generate_data_source": {
+    "step_name": "generate_data_source",
+    "last_run": "2026-04-20 15:42:11",
+    "status": "success",
+    "duration_sec": 18.9,
+    "files": [
+      {
+        "file": "qvw_metadata_restructured",
+        "finished_at": "2026-04-20 15:42:30",
+        "duration_sec": 18.9,
+        "status": "success"
+      }
+    ]
+  },
+  "generate_expression_to_dax": {
+    "step_name": "generate_expression_to_dax",
+    "last_run": "2026-04-20 15:43:36",
+    "status": "success",
+    "duration_sec": 7.53,
+    "files": [
+      {
+        "file": "Solution_Chapter 3_Airline Operations",
+        "finished_at": "2026-04-20 15:43:44",
+        "duration_sec": 7.5,
+        "status": "success"
+      }
+    ]
+  },
+  "report_exports": {
+    "step_name": "report_exports",
+    "last_run": "2026-04-20 15:35:11",
+    "status": "success",
+    "duration_sec": 96.42,
+    "files": [
+      {
+        "file": "Solution_Chapter 3_Airline Operations",
+        "finished_at": "2026-04-20 15:36:47",
+        "duration_sec": 96.41,
+        "status": "success"
+      }
+    ]
+  },
+  "output_analysis": {
+    "step_name": "output_analysis",
+    "last_run": "2026-04-20 15:45:47",
+    "status": "success",
+    "duration_sec": 0.13,
+    "files": [
+      {
+        "file": "Solution_Chapter 3_Airline Operations",
+        "finished_at": "2026-04-20 15:45:47",
+        "duration_sec": 0.13,
+        "status": "success"
+      }
+    ]
+  }
+}

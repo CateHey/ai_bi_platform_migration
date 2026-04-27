@@ -1,0 +1,454 @@
+
+m_query= """
+    ### TableName: Temp_Calendar_Range (Tab: Calendar)
+    let
+        // Transform 'Period' from 'YYYYMM' text to date format
+        MainDataWithDate = Table.TransformColumns(
+            [Main Data],
+            {{"Period", each Date.FromText(Text.From(_), "yyyyMM"), type date}}
+        ),
+        // Extract Min and Max Period
+        MinDate = List.Min(MainDataWithDate[Period]),
+        MaxDate = List.Max(MainDataWithDate[Period]),
+        // Return one-row table with MinDate and MaxDate
+        Temp_Calendar_Range = #table({"MinDate", "MaxDate"}, {{MinDate, MaxDate}})
+    in
+        Temp_Calendar_Range
+    ---
+    ### TableName: Settings_Calendar (Tab: Calendar)
+    let
+        // Simulate LET vMinDate = Peek(...)
+        CalendarVars = Temp_Calendar_Range,
+        vMinDate = CalendarVars{0}[MinDate],
+        vMaxDate = CalendarVars{0}[MaxDate]
+    in
+        [vMinDate = vMinDate, vMaxDate = vMaxDate]
+    ---
+    ### TableName: CalendarDateSeed (Tab: Calendar)
+    let
+        // Simulate AUTOGENERATE (1) WHILE logic
+        vMinDate = Settings_Calendar[vMinDate],
+        vMaxDate = Settings_Calendar[vMaxDate],
+        DateList = List.Generate(
+            () => vMinDate,
+            each _ <= vMaxDate,
+            each Date.AddMonths(_, 1)
+        ),
+        CalendarDateSeed = Table.FromList(DateList, Splitter.SplitByNothing(), {"Temp_Date"})
+    in
+        CalendarDateSeed
+    ---
+    ### TableName: CalendarRaw (Tab: Calendar)
+    let
+        Source = CalendarDateSeed,
+        AddYear = Table.AddColumn(Source, "Year", each Date.Year([Temp_Date]), Int64.Type),
+        AddMonth = Table.AddColumn(AddYear, "Month", each Date.Month([Temp_Date]), Int64.Type),
+        AddPeriod = Table.AddColumn(AddMonth, "Period", each [Year] * 100 + [Month], Int64.Type),
+        AddYearMonth = Table.AddColumn(AddPeriod, "Year - Month", each Date.ToText([Temp_Date], "yyyy-MM"), type text),
+        AddQuarter = Table.AddColumn(AddYearMonth, "Quarter", each "Q" & Number.ToText(Number.RoundUp(Date.Month([Temp_Date]) / 3)), type text),
+        CalendarRaw = Table.Distinct(AddQuarter)
+    in
+        CalendarRaw
+    ---
+    ### TableName: Master Calendar (Tab: Calendar)
+    let
+        Source = CalendarRaw,
+        
+        // Stable QuarterID from Year + Quarter using Text.ToBinary (simulating AutoNumber)
+        WithQuarterID = Table.AddColumn(
+            Source,
+            "QuarterID",
+            each Number.From(Text.ToBinary(Text.From([Year]) & [Quarter])),
+            Int64.Type
+        ),
+
+        // Stable PeriodID from Period (simulating AutoNumber)
+        WithPeriodID = Table.AddColumn(
+            WithQuarterID,
+            "PeriodID",
+            each Number.From(Text.ToBinary(Text.From([Period]))),
+            Int64.Type
+        ),
+
+        MasterCalendar = WithPeriodID
+    in
+        MasterCalendar
+"""
+input_tab= """
+    Input tab:
+
+    ///$tab Calendar
+    //--- Select the lowest and highest periods 
+    //		from the Flights fact table.
+
+    Temp_Calendar_Range:
+    LOAD
+        Num(Date#(Min(Period), 'YYYYMM'))		as MinDate,
+        Num(Date#(Max(Period), 'YYYYMM')) 		as MaxDate
+    RESIDENT [Main Data];
+
+    //--- Assign the start and end dates to variables
+    LET vMinDate = Peek('MinDate', 0, 'Temp_Calendar_Range');
+    LET vMaxDate = Peek('MaxDate', 0, 'Temp_Calendar_Range');
+
+    DROP TABLE Temp_Calendar_Range; // Cleanup
+
+    [Master Calendar]:
+    Load *,
+        AutoNumber(Year & Quarter, 'QuarterID') 		as [QuarterID],
+        AutoNumber(Period, 'PeriodID') 				as [PeriodID]
+        ;
+    LOAD DISTINCT
+        Year(Temp_Date) * 100 + Month(Temp_Date) 		as [Period],
+        Year(Temp_Date)								  	as [Year],	
+        Month(Temp_Date)								as [Month],	
+        Date(Temp_Date, 'YYYY-MM')					  	as [Year - Month],
+        'Q' & Ceil(Month(Temp_Date) / 3)			  	as [Quarter]
+        ;
+    LOAD DISTINCT
+        MonthStart($(vMinDate) + IterNo() - 1)   as Temp_Date	
+    AUTOGENERATE (1)
+    WHILE $(vMinDate) + IterNo() - 1 <= $(vMaxDate);
+
+
+    //--- Remove the temporary variables
+    LET vMinDate = Null();
+    LET vMaxDate = Null();
+"""
+input_tab_2 = """
+    ///$tab Airlines
+    [Carrier Groups]: 
+        LOAD [%Carrier Group ID], 
+            [%Carrier Group ID] as [Temp_Carrier_Group_ID],
+            [Carrier Group]
+        FROM
+        [$(vFolderSourceData)QVDs\Carrier Groups.qvd]
+        (qvd)
+            Where Exists([%Carrier Group ID]);
+
+    Concatenate ([Carrier Groups])
+        Load Distinct
+            [%Carrier Group ID],
+            'Unknown' as [Carrier Group]
+        Resident [Main Data]
+            Where not Exists([Temp_Carrier_Group_ID], [%Carrier Group ID]);
+
+    Drop Field [Temp_Carrier_Group_ID];
+
+    Airlines:
+        LOAD [%Airline ID], 
+            Airline
+        FROM
+        [$(vFolderSourceData)QVDs\Airlines.qvd]
+        (qvd)
+            Where Exists([%Airline ID]);
+
+    [Carrier Operating Region]:
+        LOAD [%Region Code], 
+            [%Region Code] as [Temp_Region_Code],
+            [Carrier's Operating Region]
+        FROM
+        [$(vFolderSourceData)QVDs\Carrier Operating Region.qvd]
+        (qvd)
+            Where Exists([%Region Code]);
+
+    Concatenate ([Carrier Operating Region])
+        Load Distinct
+            [%Region Code],
+            'Unknown' as [Carrier's Operating Region]
+        Resident [Main Data]
+            Where not Exists([Temp_Region_Code], [%Region Code]);
+
+    DROP Field [Temp_Region_Code];
+
+    [Flight Types]:
+        LOAD [%Datasource ID], 
+            [Flight Type]
+        FROM
+        [$(vFolderSourceData)QVDs\Flight Types.qvd]
+        (qvd)
+            Where Exists([%Datasource ID]);     
+"""
+m_query_2 ="""
+    ### TableName: Carrier Groups (Tab: Airlines)
+    let
+        ValidCarrierGroupIDs = List.Distinct(Main[%Carrier Group ID]),
+        CarrierGroups = Table.SelectRows(
+            Qvd.CarrierGroups,
+            each List.Contains(ValidCarrierGroupIDs, [%Carrier Group ID])
+        )
+    in
+        CarrierGroups
+    ---
+    ### TableName: Carrier Groups Unknown (Tab: Airlines)
+    let
+        TempCarrierIDs = List.Distinct(CarrierGroups[%Carrier Group ID]),
+        CarrierGroups_Unknown = Table.SelectRows(
+            Table.Distinct(Main),
+            each not List.Contains(TempCarrierIDs, Record.Field(_, "%Carrier Group ID"))
+        ),
+        CarrierGroups_Unknown = Table.AddColumn(
+            CarrierGroups_Unknown,
+            "Carrier Group",
+            each "Unknown",
+            type text
+        ),
+        CarrierGroups_Unknown = Table.SelectColumns(
+            CarrierGroups_Unknown,
+            {"%Carrier Group ID", "Carrier Group"}
+        )
+    in
+        CarrierGroups_Unknown
+    ---
+    ### TableName: Carrier Groups Combined (Tab: Airlines)
+    let
+        CarrierGroups_Combined = Table.Combine({CarrierGroups, CarrierGroups_Unknown})
+    in
+        CarrierGroups_Combined
+    ---
+    ### TableName: Airlines (Tab: Airlines)
+    let
+        ValidAirlineIDs = List.Distinct(Main[%Airline ID]),
+        Airlines = Table.SelectRows(
+            Qvd.Airlines,
+            each List.Contains(ValidAirlineIDs, [%Airline ID])
+        )
+    in
+        Airlines
+    ---
+    ### TableName: Carrier Operating Region (Tab: Airlines)
+    let
+        ValidRegionCodes = List.Distinct(Main[%Region Code]),
+        CarrierOperatingRegion = Table.SelectRows(
+            Qvd.CarrierOperatingRegion,
+            each List.Contains(ValidRegionCodes, [%Region Code])
+        )
+    in
+        CarrierOperatingRegion
+    ---
+    ### TableName: Carrier Operating Region Unknown (Tab: Airlines)
+    let
+        TempRegionCodes = List.Distinct(CarrierOperatingRegion[%Region Code]),
+        CarrierOperatingRegion_Unknown = Table.SelectRows(
+            Table.Distinct(Main),
+            each not List.Contains(TempRegionCodes, Record.Field(_, "%Region Code"))
+        ),
+        CarrierOperatingRegion_Unknown = Table.AddColumn(
+            CarrierOperatingRegion_Unknown,
+            "Carrier's Operating Region",
+            each "Unknown",
+            type text
+        ),
+        CarrierOperatingRegion_Unknown = Table.SelectColumns(
+            CarrierOperatingRegion_Unknown,
+            {"%Region Code", "Carrier's Operating Region"}
+        )
+    in
+        CarrierOperatingRegion_Unknown
+    ---
+    ### TableName: Carrier Operating Region Combined (Tab: Airlines)
+    let
+        CarrierOperatingRegion_Combined = Table.Combine({CarrierOperatingRegion, CarrierOperatingRegion_Unknown})
+    in
+        CarrierOperatingRegion_Combined
+    ---
+    ### TableName: Flight Types (Tab: Airlines)
+    let
+        ValidDatasourceIDs = List.Distinct(Main[%Datasource ID]),
+        FlightTypes = Table.SelectRows(
+            Qvd.FlightTypes,
+            each List.Contains(ValidDatasourceIDs, [%Datasource ID])
+        )
+    in
+        FlightTypes
+"""
+input_tab_3 = """
+    ///$tab Aircrafts
+    //========================================[ Aircraft Types ]========================================
+
+    [Aircraft Types]:
+    LOAD 
+        AC_TYPEID 											as [%Aircraft Type ID], 
+        AC_GROUP 											as [%Aircraft Group Type], 
+        SSD_NAME 											as [Aircraft Name], 
+        MANUFACTURER 										as [Aircraft Manufacturer], 
+        ApplyMap('Map_Manufacturer_Country', 
+                MANUFACTURER, 'Unknown') 				as [Aircraft Manufacturer Country], 
+        LONG_NAME 											as [Aircraft Name Full], 
+        SHORT_NAME 										as [Aircraft Name Abbreviated], 
+        BEGIN_DATE 										as [Aircraft Begin Date], 
+        END_DATE 											as [Aircraft End Date],
+        If(Year(BEGIN_DATE) < 1990, 
+            'Classic', 'Current') 							as [Aircraft Age Classification]
+    FROM
+    [$(vFolderSourceData)CSVs\Aircraft_Base_File.csv]
+    (txt, codepage is 1252, embedded labels, delimiter is ';', msq)
+        Where Exists([%Aircraft Type ID], AC_TYPEID);
+
+    CALL TraceRowCount('Aircraft Types');
+
+    //--- Add the engine configuration information to the aircraft data
+    LEFT JOIN ([Aircraft Types])
+    LOAD 
+        [Aircraft Group ID] 								as [%Aircraft Group Type], //*** Key field
+        [Aircraft Engine Type], 
+        [Aircraft Number Of Engines]
+    FROM
+    [$(vFolderSourceData)CSVs\Aircraft_Group.csv]
+    (txt, codepage is 1252, embedded labels, delimiter is ';', msq);
+
+
+    CALL TraceRowCount('Aircraft Types');
+
+    //--- No longer this key as we just joined the Engine Type and Number of Engines
+    //    to the Aircraft Types table.
+    DROP FIELD [%Aircraft Group Type] FROM [Aircraft Types];
+
+    //--- Add the 2010 update to the Aircraft Types table.
+    CONCATENATE([Aircraft Types])
+    LOAD 
+        AC_TYPEID 											as [%Aircraft Type ID], 
+        SubField(AC_GROUPNAME, ', ', 1)					as [Aircraft Engine Type],         //--- 2010 files already contains
+        SubField(AC_GROUPNAME, ', ', 2) 					as [Aircraft Number Of Engines],   //    the engine configuration.
+        SSD_NAME 											as [Aircraft Name], 
+        MANUFACTURER 										as [Aircraft Manufacturer], 
+        ApplyMap('Map_Manufacturer_Country', 
+                MANUFACTURER, 'Unknown') 				as [Aircraft Manufacturer Country],
+        LONG_NAME 											as [Aircraft Name Full], 
+        SHORT_NAME 										as [Aircraft Name Abbreviated], 
+        BEGIN_DATE 										as [Aircraft Begin Date], 
+        END_DATE 											as [Aircraft End Date],
+        'Current' 											as [Aircraft Age Classification] //--- No need to check, the 2010 file only contains 
+    FROM                                            										 //    recent aircrafts.
+    [$(vFolderSourceData)CSVs\Aircraft_2010_Update.csv]
+    (txt, codepage is 1252, embedded labels, delimiter is ';', msq)
+        Where Exists([%Aircraft Type ID], AC_TYPEID);
+
+    //--- Store transformed QVD
+    STORE [Aircraft Types] INTO '$(vFolderSourceData)QVDs\Aircraft Types Transformed.qvd' (qvd);
+"""
+m_query_3 ="""
+    ### TableName: Aircraft Types (Tab: Aircrafts)
+    let
+        Source = Csv.Document(
+            File.Contents(vFolderSourceData & "CSVs/Aircraft_Base_File.csv"),
+            [Delimiter = ";", Encoding = 1252, QuoteStyle = QuoteStyle.None]
+        ),
+        PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+        RenamedColumns = Table.RenameColumns(
+            PromotedHeaders,
+            {
+                {"AC_TYPEID", "%Aircraft Type ID"},
+                {"AC_GROUP", "%Aircraft Group Type"},
+                {"SSD_NAME", "Aircraft Name"},
+                {"MANUFACTURER", "Aircraft Manufacturer"},
+                {"LONG_NAME", "Aircraft Name Full"},
+                {"SHORT_NAME", "Aircraft Name Abbreviated"},
+                {"BEGIN_DATE", "Aircraft Begin Date"},
+                {"END_DATE", "Aircraft End Date"}
+            }
+        ),
+        AddedManufacturerCountry = Table.AddColumn(
+            RenamedColumns,
+            "Aircraft Manufacturer Country",
+            each try Record.Field(Map_Manufacturer_Country, [Aircraft Manufacturer]) otherwise "Unknown"
+        ),
+        AddedAgeClassification = Table.AddColumn(
+            AddedManufacturerCountry,
+            "Aircraft Age Classification",
+            each if Date.Year([Aircraft Begin Date]) < 1990 then "Classic" else "Current"
+        )
+    in
+        AddedAgeClassification
+    ---
+    ### TableName: Aircraft Types (Tab: Aircrafts) – After Engine Join
+    let
+        SourceAircraftTypes = #"Aircraft Types (Tab: Aircrafts)",
+        SourceAircraftGroup = Csv.Document(
+            File.Contents(vFolderSourceData & "CSVs/Aircraft_Group.csv"),
+            [Delimiter = ";", Encoding = 1252, QuoteStyle = QuoteStyle.None]
+        ),
+        PromotedHeadersGroup = Table.PromoteHeaders(SourceAircraftGroup, [PromoteAllScalars = true]),
+        RenamedGroup = Table.RenameColumns(
+            PromotedHeadersGroup,
+            {
+                {"Aircraft Group ID", "%Aircraft Group Type"},
+                {"Aircraft Engine Type", "Aircraft Engine Type"},
+                {"Aircraft Number Of Engines", "Aircraft Number Of Engines"}
+            }
+        ),
+        MergedTables = Table.NestedJoin(
+            SourceAircraftTypes,
+            "%Aircraft Group Type",
+            RenamedGroup,
+            "%Aircraft Group Type",
+            "GroupDetails",
+            JoinKind.LeftOuter
+        ),
+        ExpandedJoin = Table.ExpandTableColumn(
+            MergedTables,
+            "GroupDetails",
+            {"Aircraft Engine Type", "Aircraft Number Of Engines"}
+        )
+    in
+        ExpandedJoin
+    ---
+    ### TableName: Aircraft Types (Tab: Aircrafts) – After Drop Field
+    let
+        PreviousStep = #"Aircraft Types (Tab: Aircrafts) – After Engine Join",
+        DroppedField = Table.RemoveColumns(PreviousStep, {"%Aircraft Group Type"})
+    in
+        DroppedField
+    ---
+    ### TableName: Aircraft Types 2010 Update (Tab: Aircrafts)
+    let
+        Source = Csv.Document(
+            File.Contents(vFolderSourceData & "CSVs/Aircraft_2010_Update.csv"),
+            [Delimiter = ";", Encoding = 1252, QuoteStyle = QuoteStyle.None]
+        ),
+        PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+        RenamedColumns = Table.RenameColumns(
+            PromotedHeaders,
+            {
+                {"AC_TYPEID", "%Aircraft Type ID"},
+                {"SSD_NAME", "Aircraft Name"},
+                {"MANUFACTURER", "Aircraft Manufacturer"},
+                {"LONG_NAME", "Aircraft Name Full"},
+                {"SHORT_NAME", "Aircraft Name Abbreviated"},
+                {"BEGIN_DATE", "Aircraft Begin Date"},
+                {"END_DATE", "Aircraft End Date"},
+                {"AC_GROUPNAME", "AC_GROUPNAME"}
+            }
+        ),
+        EngineType = Table.AddColumn(
+            RenamedColumns,
+            "Aircraft Engine Type",
+            each Text.BeforeDelimiter([AC_GROUPNAME], ", ")
+        ),
+        NumEngines = Table.AddColumn(
+            EngineType,
+            "Aircraft Number Of Engines",
+            each Text.AfterDelimiter([AC_GROUPNAME], ", ")
+        ),
+        AddedManufacturerCountry = Table.AddColumn(
+            NumEngines,
+            "Aircraft Manufacturer Country",
+            each try Record.Field(Map_Manufacturer_Country, [Aircraft Manufacturer]) otherwise "Unknown"
+        ),
+        AddAgeClass = Table.AddColumn(
+            AddedManufacturerCountry,
+            "Aircraft Age Classification",
+            each "Current"
+        )
+    in
+        AddAgeClass
+    ---
+    ### TableName: Aircraft Types (Tab: Aircrafts)
+    let
+        PreviousAircraftTypes = #"Aircraft Types (Tab: Aircrafts) – After Drop Field",
+        AircraftUpdate2010 = #"Aircraft Types 2010 Update (Tab: Aircrafts)",
+        Combined = Table.Combine({PreviousAircraftTypes, AircraftUpdate2010})
+    in
+        Combined
+    ---
+"""

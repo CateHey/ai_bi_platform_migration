@@ -1,0 +1,10 @@
+{
+  "DOCUMENT_ANALYZER_PATH": "C:/Users/YourName/Documents/DocumentAnalyzer_V3.10.qvw",
+  "root_folder_path": "C:/Users/YourName/Documents/project_root/data/input_qvw_samples",
+  "output_qv_folder_path": "C:/Users/YourName/Documents/project_root/output/qvw_metadata/qvwork",
+  "output_qv_restructured_folder_path": "C:/Users/YourName/Documents/project_root/output/qvw_metadata_restructured",
+  "api_key": "your open api key",
+  "azure_endpoint": "your azure openai endpoint url",
+  "assets_folder_path": "C:/Users/YourName/Documents/project_root/assets",
+  "field_mapping_file_path": "C:/Users/YourName/Documents/project_root/assets/mapping/field_mapping.csv"
+}

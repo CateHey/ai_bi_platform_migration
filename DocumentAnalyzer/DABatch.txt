@@ -1,0 +1,78 @@
+@ECHO OFF
+SETLOCAL
+REM Document Analyzer Batch Analysis Script
+REM Copyright 2017 Rob Wunderlich  http://QlikCoobook.com
+SET DaScriptVer=v1.0
+
+REM **** Usage ****************************************************************
+REM  "DaBatch.cmd somedir"
+REM  where somedir is a directory the contains QVWs to be analyzed. 
+REM  Configure the Environment below as required. 
+REM ***************************************************************************
+
+REM *************************************************************************** 
+REM Environment Configuration. Set the variables below for your environment.
+REM Do not quote any of the settings.
+
+REM ***  Path to QV.exe executable ***
+SET qvDir=C:\Program Files\QlikView\Qv.exe
+
+REM ***  Path to DocumentAnalyzer.qvw. Note that v3.6 or later is required! ***
+SET DaPath=DocumentAnalyzer_V3.6.qvw
+
+REM *** Directory to store DocumentAnalyzerResults QVDs and QVWs. Will be created if it doesn't exist ***
+SET DaResultsDir=C:\temp\MyDaResults
+
+REM  End Environement Configuration 
+REM *************************************************************************** 
+
+REM ***** Options below usually don't need changing, except for debugging *****
+REM *** Should the metadata directory be deleted (YES/NO) after reload? Usually YES ***
+SET DeleteDataAfterReload=YES
+REM *** Should the analyzer results be stored in a QVD (YES/NO)?  ***
+SET SaveResultsInQVD=YES
+REM *** Should the analyzer results be stored in a QVW (YES/NO)?  ***
+SET SaveResultsInQVW=YES
+
+
+SETLOCAL ENABLEDELAYEDEXPANSION
+REM If no directory parameter, then show usaage and exit
+IF  [%1] == [] goto Usage
+
+ECHO Starting Batch QV DocumentAnalyer %DaScriptVer%
+ECHO Analyzing Directory: %1
+ECHO DocumentAnalyer Results will be stored in: %DaResultsDir%
+SET /P AnalysisTitle="Analysis Title? <ENTER> for 'Baseline' "
+IF "%AnalysisTitle%" == "" SET AnalysisTitle=Baseline
+ECHO All analysis results will be titled: "%AnalysisTitle%"
+
+REM Create the DaResultsDir
+IF NOT EXIST  "%DaResultsDir%". mkdir "%DaResultsDir%""
+
+REM Analyze each QVW found in the target directory
+SET analyzedCount=0;
+
+FOR %%I IN (%1\*.qvw) DO (
+    ECHO Analyzing %%I
+    "%qvDir%" /NoSecurity /vvBatchMode=1 ^
+    /vvDeleteDataAfterReload=%DeleteDataAfterReload%  ^
+    /vvSaveResultsInQVD=%SaveResultsInQVD% ^
+    /vvSaveResultsInQVW=%SaveResultsInQVW% ^
+    "/vvAnalysisTitle=%AnalysisTitle%" ^
+    "/vQVW=%%I" ^
+    "/vvDaResultsDir=%DaResultsDir%"  ^
+    "%DaPath%"
+    SET /A analyzedCount+=1
+)    
+
+ECHO *****************************************************
+ECHO Batch Analysis complete. %analyzedCount% QVWs analyzed.
+ECHO *****************************************************
+EXIT /B 0
+
+:Usage 
+ECHO *****************************************************
+ECHO ERROR: No qvw directory specified
+ECHO Usage: DaBatch.cmd QvwDirectory
+ECHO *****************************************************
+EXIT /B 1

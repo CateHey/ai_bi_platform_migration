@@ -1,0 +1,60 @@
+[
+  {
+    "page": 1,
+    "sheet_name": "Main",
+    "file_name": "01_Main.png",
+    "full_size_px": [
+      3300,
+      2550
+    ],
+    "content_bbox_px": [
+      224,
+      224,
+      3074,
+      1638
+    ],
+    "content_size_px": [
+      2850,
+      1414
+    ],
+    "content_size_cm": [
+      24.13,
+      11.97
+    ],
+    "relative_position": {
+      "x": 0.068,
+      "y": 0.088,
+      "width": 0.864,
+      "height": 0.555
+    }
+  },
+  {
+    "page": 2,
+    "sheet_name": "Dashboard",
+    "file_name": "02_Dashboard.png",
+    "full_size_px": [
+      3300,
+      2550
+    ],
+    "content_bbox_px": [
+      224,
+      224,
+      3074,
+      1636
+    ],
+    "content_size_px": [
+      2850,
+      1412
+    ],
+    "content_size_cm": [
+      24.13,
+      11.95
+    ],
+    "relative_position": {
+      "x": 0.068,
+      "y": 0.088,
+      "width": 0.864,
+      "height": 0.554
+    }
+  }
+]
