@@ -31,63 +31,54 @@ def extract_qv_metadata(settings, logger, overwrite_existing=False, multiplier=1
         
         metadata_folder = output_qv_restructured_folder_path / report_name
         metadata_folder_input = qv_output_folder / report_name
-        output_metadata_file = metadata_folder / "sheets.csv"  # Adjust if your key output differs
 
-        needs_processing = False
         window_opened = False
 
         start_file(report_name)
         print(f"Executing start_file of " + report_name)
 
-        # Case 1: Output does not exist
-        if not output_metadata_file.exists():
-            logger.info(f"[NEW] Metadata output missing for {qvw_file.name}. Will extract.")
-            print(f"[NEW] Extracting metadata for: {qvw_file.name}")
-            needs_processing = True
+        # Check if qvwork already has data for this report — skip DocumentAnalyzer only
+        qvwork_has_data = metadata_folder_input.exists() and any(metadata_folder_input.iterdir())
 
-        # Case 2: Overwrite is enabled
-        elif overwrite_existing:
-            logger.info(f"[OVERWRITE] Forcing metadata extraction for: {qvw_file.name}")
-            print(f"[OVERWRITE] Forcing metadata extraction for: {qvw_file.name}")
-            needs_processing = True
-
-        # Case 3: File has changed
-        elif should_process_qvw(qvw_file, cache, relative_to=root_folder):
-            logger.info(f"[CHANGED] Metadata will be refreshed for: {qvw_file.name}")
-            print(f"[CHANGED] Metadata will be refreshed for: {qvw_file.name}")
-            needs_processing = True
-
-        # Case 4: No changes
+        if qvwork_has_data and not overwrite_existing:
+            logger.info(f"[SKIP DA] qvwork data exists for {qvw_file.name}. Skipping DocumentAnalyzer.")
+            print(f"[SKIP DA] qvwork data exists for {qvw_file.name}. Skipping DocumentAnalyzer.")
         else:
-            logger.info(f"[SKIP] No changes in {qvw_file.name}. Skipping metadata extraction.")
-            print(f"[SKIP] No changes in {qvw_file.name}. Skipping metadata extraction.")
-            continue
-        
-        # Execute processing
-        if needs_processing:
-            logger.info(f"Starting metadata processing for: {report_name}")
-            print(f"Starting metadata processing for: {report_name}")
-            try: 
+            if overwrite_existing:
+                logger.info(f"[OVERWRITE] Forcing metadata extraction for: {qvw_file.name}")
+                print(f"[OVERWRITE] Forcing metadata extraction for: {qvw_file.name}")
+            else:
+                logger.info(f"[NEW] No qvwork data for {qvw_file.name}. Running DocumentAnalyzer.")
+                print(f"[NEW] Extracting metadata for: {qvw_file.name}")
+
+            try:
                 automate_qlikview(settings["DOCUMENT_ANALYZER_PATH"], str(qvw_file), logger, multiplier=multiplier)
                 window_opened = True
                 time.sleep(2)
                 update_qvw_cache_entry(qvw_file, cache, relative_to=root_folder)
-                
-                logger.info(f"Starting to replicate file in restructured: {metadata_folder}")
-                print(f"Starting to replicate file in restructured: {metadata_folder}")
+                time.sleep(8)
+            except Exception as e:
+                logger.error(f"[ERROR] DocumentAnalyzer failed for {report_name}: {str(e)}", exc_info=True)
+                end_file(report_name, "failed")
+                continue
 
-                copy_output_to_restructured_by_source_structure(
+        # Always run the copy step
+        try:
+            logger.info(f"Copying output to restructured: {metadata_folder}")
+            print(f"Copying output to restructured: {metadata_folder}")
+
+            copy_output_to_restructured_by_source_structure(
                 root_folder,
                 metadata_folder,
                 metadata_folder_input,
                 logger,
                 overwrite_existing=overwrite_existing
-                )
-                end_file(report_name, "success")
-                print(f"Metadata extracted for: {qvw_file.name}")
-            except Exception as e:
-                logger.error(f"[ERROR] {report_name} failed: {str(e)}", exc_info=True)
-                end_file(report_name, "failed")
+            )
+            end_file(report_name, "success")
+            print(f"Done: {qvw_file.name}")
+        except Exception as e:
+            logger.error(f"[ERROR] Copy failed for {report_name}: {str(e)}", exc_info=True)
+            end_file(report_name, "failed")
                       
     
     # Save updated cache
@@ -165,7 +156,7 @@ def parse_xml(settings, logger, overwrite_existing=False):
     step_failed = False
 
     print(f"\n{'='*60}")
-    print(f"📄 XML PARSING")
+    print(f" XML PARSING")
     print(f"{'='*60}")
     print(f"Scanning Document folders in: {output_qv_restructured_folder_path}")
     print(f"Overwrite existing: {overwrite_existing}")
@@ -179,21 +170,21 @@ def parse_xml(settings, logger, overwrite_existing=False):
             overwrite_existing=overwrite_existing
         )
 
-        print(f"  📊 Processed {total_files_processed} XML file(s)")
-        print(f"  📊 Collected {len(field_occurrence)} unique field(s)")
+        print(f"   Processed {total_files_processed} XML file(s)")
+        print(f"   Collected {len(field_occurrence)} unique field(s)")
 
         output_csv_path = os.path.join(output_qv_restructured_folder_path, "objects_all_fields.csv")
         save_all_fields_report(output_csv_path, field_occurrence, total_files_processed, logger)
         if os.path.exists(output_csv_path):
-            print(f"  ✓ Saved: objects_all_fields.csv → {output_csv_path}")
+            print(f"   Saved: objects_all_fields.csv  {output_csv_path}")
 
         end_file("all_reports", "success")
         print(f"\n{'='*60}")
-        print(f"📄 XML PARSING SUMMARY: {total_files_processed} XML files, {len(field_occurrence)} fields")
+        print(f" XML PARSING SUMMARY: {total_files_processed} XML files, {len(field_occurrence)} fields")
         print(f"{'='*60}\n")
     except Exception as e:
         logger.error(f"[ERROR] parse_xml failed: {str(e)}", exc_info=True)
-        print(f"❌ XML parsing failed: {e}")
+        print(f" XML parsing failed: {e}")
         end_file("all_reports", "failed")
         step_failed = True
 
@@ -215,7 +206,7 @@ def map_fields(settings, logger, overwrite_existing=False):
     processed_reports = set()
 
     print(f"\n{'='*60}")
-    print(f"🔀 FIELD MAPPING")
+    print(f" FIELD MAPPING")
     print(f"{'='*60}")
     print(f"Loading field mapping from: {field_mapping_file_path}")
     field_mapping_dict = load_mapping(field_mapping_file_path, logger)
@@ -237,7 +228,7 @@ def map_fields(settings, logger, overwrite_existing=False):
                     continue  # Avoid duplicate processing
                 processed_reports.add(report_name)
 
-                print(f"\n→ Mapping report: {report_name}")
+                print(f"\n Mapping report: {report_name}")
                 start_file(report_name)
                 try:
                     mapped_count = 0
@@ -252,7 +243,7 @@ def map_fields(settings, logger, overwrite_existing=False):
                                 mapped_count += 1
                             else:
                                 logger.debug(f"Skipped (no mapping for prefix): {file_path}")
-                    print(f"  ✅ {report_name}: processed {mapped_count} CSV file(s)")
+                    print(f"   {report_name}: processed {mapped_count} CSV file(s)")
                     end_file(report_name, "success")
                     reports_ok += 1
                 except Exception as inner_e:
@@ -260,14 +251,14 @@ def map_fields(settings, logger, overwrite_existing=False):
                     end_file(report_name, "failed")
                     step_failed = True
                     reports_failed += 1
-                    print(f"  ❌ Failed to map fields for {report_name}: {inner_e}")
+                    print(f"   Failed to map fields for {report_name}: {inner_e}")
     except Exception as outer_e:
         logger.error(f"[ERROR] map_fields global failure: {str(outer_e)}", exc_info=True)
         step_failed = True
         print(f"map_fields step failed: {outer_e}")
 
     print(f"\n{'='*60}")
-    print(f"🔀 FIELD MAPPING SUMMARY: {reports_ok} ok, {reports_failed} failed, {len(processed_reports)} total")
+    print(f" FIELD MAPPING SUMMARY: {reports_ok} ok, {reports_failed} failed, {len(processed_reports)} total")
     print(f"{'='*60}\n")
 
     finalize(logger, force_fail=step_failed)
@@ -284,7 +275,7 @@ def generate_data_source(model_name, client, settings, logger, overwrite_existin
     output_qv_restructured_folder_path = Path(settings["output_qv_restructured_folder_path"])
 
     print(f"\n{'='*60}")
-    print(f"🧩 DATA SOURCE CREATION (M QUERY)")
+    print(f" DATA SOURCE CREATION (M QUERY)")
     print(f"{'='*60}")
     print(f"Scanning for script.qvs files in: {output_qv_restructured_folder_path}")
 
@@ -307,7 +298,7 @@ def generate_data_source(model_name, client, settings, logger, overwrite_existin
 
             qvw_name = Path(file_path).parts[-3]
 
-            print(f"\n→ [{qvw_name}] Generating M query from {os.path.basename(file_path)}")
+            print(f"\n [{qvw_name}] Generating M query from {os.path.basename(file_path)}")
 
             # ========Execution history and monitoring ========
             start_file(qvw_name)
@@ -318,7 +309,7 @@ def generate_data_source(model_name, client, settings, logger, overwrite_existin
             # Case 2 Run Option: If output already exists we move to the next step
             if os.path.exists(m_output_path) and not overwrite_existing:
                 logger.info(f"Skipping {file_path} - m_query_output.csv already exists.")
-                print(f"  ⏭️  Skipping — m_query_output.csv already exists at {m_output_path}")
+                print(f"    Skipping — m_query_output.csv already exists at {m_output_path}")
 
                 # ========Execution history and monitoring ========
                 end_file(qvw_name, "skipped")
@@ -328,22 +319,22 @@ def generate_data_source(model_name, client, settings, logger, overwrite_existin
             # Case 2 Overwrite Option: Overwrite enabled → force process
             elif overwrite_existing and os.path.exists(m_output_path):
                 logger.info(f"Overwriting existing: m_query_output.csv for {qvw_name} ")
-                print(f"  🔄 Overwriting existing m_query_output.csv for {qvw_name}")
+                print(f"   Overwriting existing m_query_output.csv for {qvw_name}")
                 try:
                     if os.path.exists(m_output_path):
                         os.remove(m_output_path)
-                        print(f"  🗑️  Deleted stale file: {m_output_path}")
+                        print(f"    Deleted stale file: {m_output_path}")
                 except Exception as e:
-                    print(f"  ⚠️  Failed to delete {m_output_path}: {e}")
+                    print(f"    Failed to delete {m_output_path}: {e}")
 
             line_count = len(qvs_content.splitlines())
-            print(f"  📄 Script has {line_count} lines")
+            print(f"   Script has {line_count} lines")
             logger.info(f"The script {file_path} has {line_count} lines.")
 
             split = str(split).strip().lower() in ("y", "yes", "true", "1")
 
             tabs = split_qvs_by_tab(qvs_content) if split else [("FullScript", qvs_content)]
-            print(f"  📑 Split into {len(tabs)} tab(s)")
+            print(f"   Split into {len(tabs)} tab(s)")
             output_rows = []
 
             #Building of the RAG embedded knowledge database
@@ -351,7 +342,7 @@ def generate_data_source(model_name, client, settings, logger, overwrite_existin
 
             for tab_name, tab_code in tabs:
                 try:
-                    print(f"    ⚙️  Processing tab: {tab_name} ({len(tab_code.splitlines())} lines) → calling {model_name}")
+                    print(f"      Processing tab: {tab_name} ({len(tab_code.splitlines())} lines)  calling {model_name}")
                     logger.info(f"Processing tab: {tab_name} ({len(tab_code.splitlines())} lines)")
 
                     prompt = generate_data_source_prompt(tab_name, tab_code, client, assets_folder)
@@ -367,11 +358,11 @@ def generate_data_source(model_name, client, settings, logger, overwrite_existin
 
                     output_text = response.choices[0].message.content.strip().replace("```m", "").replace("```", "")
                     parsed = extract_table_blocks(output_text)
-                    print(f"    ✓ Tab {tab_name}: extracted {len(parsed)} table block(s)")
+                    print(f"     Tab {tab_name}: extracted {len(parsed)} table block(s)")
                     output_rows.extend(parsed)
 
                 except Exception as e:
-                    print(f"    ❌ Failed processing tab: {tab_name} - {e}")
+                    print(f"     Failed processing tab: {tab_name} - {e}")
                     logger.error(f"Failed processing tab: {tab_name} - {e}")
 
             try:
@@ -381,7 +372,7 @@ def generate_data_source(model_name, client, settings, logger, overwrite_existin
                 # ========Execution history and monitoring ========
                 end_file(qvw_name, "success")
                 reports_ok += 1
-                print(f"  ✅ {qvw_name}: {len(output_rows)} M query table(s) saved")
+                print(f"   {qvw_name}: {len(output_rows)} M query table(s) saved")
 
             except Exception as e:
 
@@ -390,17 +381,17 @@ def generate_data_source(model_name, client, settings, logger, overwrite_existin
                 end_file(qvw_name, "failed")
                 reports_failed += 1
 
-                print(f"  ❌ Failed to generate M Query script for {qvw_name}: {e}")
+                print(f"   Failed to generate M Query script for {qvw_name}: {e}")
                 logger.error(f"Failed to generate M Query script for {file_path}: {e}")
 
     except Exception as e:
         # ========Execution history and monitoring ========
         step_failed=True
-        print(f"❌ generate_data_source global failure: {e}")
+        print(f" generate_data_source global failure: {e}")
         logger.error(f"generate_data_source global failure: {e}", exc_info=True)
 
     print(f"\n{'='*60}")
-    print(f"🧩 DATA SOURCE SUMMARY: {reports_ok} ok, {reports_skipped} skipped, {reports_failed} failed")
+    print(f" DATA SOURCE SUMMARY: {reports_ok} ok, {reports_skipped} skipped, {reports_failed} failed")
     print(f"{'='*60}\n")
 
     # ========Execution history and monitoring ========
@@ -418,7 +409,7 @@ def generate_expression_to_dax(model_name, client, settings, logger, overwrite_e
     start_file, end_file, finalize = start_step_tracking("generate_expression_to_dax", json_path=execution_path)
 
     print(f"\n{'='*60}")
-    print(f"🧮 EXPRESSION → DAX TRANSLATION")
+    print(f" EXPRESSION  DAX TRANSLATION")
     print(f"{'='*60}")
     print(f"Scanning for expressions.csv in: {output_qv_restructured_folder_path}")
     print(f"Model: {model_name} | overwrite={overwrite_existing}")
@@ -439,12 +430,12 @@ def generate_expression_to_dax(model_name, client, settings, logger, overwrite_e
             start_file=start_file,
             end_file=end_file)
         print(f"\n{'='*60}")
-        print(f"🧮 DAX TRANSLATION COMPLETED")
+        print(f" DAX TRANSLATION COMPLETED")
         print(f"{'='*60}\n")
     except Exception as e:
         step_failed=True
         logger.error(f"[FATAL] DAX generation failed: {e}", exc_info=True)
-        print(f"❌ DAX generation failed: {e}")
+        print(f" DAX generation failed: {e}")
 
     finalize(logger, force_fail=step_failed)
 
@@ -465,7 +456,7 @@ def report_exports(settings, logger, overwrite_existing=False, multiplier=1):
     cache = load_qvw_cache(cache_path)
 
     print(f"\n{'='*60}")
-    print(f"📑 REPORT PDF EXPORT")
+    print(f" REPORT PDF EXPORT")
     print(f"{'='*60}")
     print(f"Scanning QVWs in: {root_folder}")
     print(f"Found {len(qvw_files)} QVW file(s) | overwrite={overwrite_existing}")
@@ -505,13 +496,13 @@ def report_exports(settings, logger, overwrite_existing=False, multiplier=1):
             if not os.path.exists(json_path):
                 os.makedirs(reportpages_folder, exist_ok=True)
                 logger.info(f"[NEW] PDF doesn't exist for {qvw_file.name}. Processing it.")
-                print(f"\n→ [NEW] Generating PDF for: {qvw_file.name}")
+                print(f"\n [NEW] Generating PDF for: {qvw_file.name}")
                 needs_processing = True
 
             # Case 2 Overwrite Option: Overwrite enabled → force process
             elif overwrite_existing:
                 logger.info(f"Overwriting existing PDF for: {qvw_file.name}")
-                print(f"\n→ [OVERWRITE] Regenerating PDF for: {qvw_file.name}")
+                print(f"\n [OVERWRITE] Regenerating PDF for: {qvw_file.name}")
                 if os.path.exists(reportpages_folder):
                     shutil.rmtree(reportpages_folder)
                     os.makedirs(reportpages_folder, exist_ok=True)
@@ -520,7 +511,7 @@ def report_exports(settings, logger, overwrite_existing=False, multiplier=1):
             # Case 3: Check if the file has changed for Run option
             elif should_process_qvw(qvw_file, cache, relative_to=root_folder):
                 logger.info(f"Auto-processing changed file: {qvw_file.name}")
-                print(f"\n→ [CHANGED] Auto-processing: {qvw_file.name}")
+                print(f"\n [CHANGED] Auto-processing: {qvw_file.name}")
                 if os.path.exists(reportpages_folder):
                     shutil.rmtree(reportpages_folder)
                     os.makedirs(reportpages_folder, exist_ok=True, parent_dir=True)
@@ -529,17 +520,17 @@ def report_exports(settings, logger, overwrite_existing=False, multiplier=1):
             # Case 4: No action needed
             else:
                 logger.info(f"No changes in {qvw_file.name}. Skipping.")
-                print(f"  ⏭️  [SKIP] No changes in {qvw_file.name}")
+                print(f"    [SKIP] No changes in {qvw_file.name}")
                 end_file(report_name, "skipped")
                 reports_skipped += 1
                 continue
 
             # Perform processing if needed
             if needs_processing:
-                print(f"  🖨️  Automating QlikView → PDF export")
+                print(f"    Automating QlikView  PDF export")
                 automate_qlikview_report_to_pdf(qvw_file, output_pdf_path, logger, multiplier=multiplier)
                 time.sleep(2)
-                print(f"  ✂️  Splitting PDF by sheets using {sheets_csv_path.name}")
+                print(f"    Splitting PDF by sheets using {sheets_csv_path.name}")
                 split_pdf_by_sheets(
                     output_pdf_path,
                     sheets_csv_path,
@@ -550,10 +541,10 @@ def report_exports(settings, logger, overwrite_existing=False, multiplier=1):
                 update_qvw_cache_entry(qvw_file, cache, relative_to=root_folder)
                 end_file(report_name, "success")
                 reports_ok += 1
-                print(f"  ✅ Report exported: {output_pdf_path}")
+                print(f"   Report exported: {output_pdf_path}")
 
         except Exception as e:
-            print(f"  ❌ Report export failed for {qvw_file.name}: {e}")
+            print(f"   Report export failed for {qvw_file.name}: {e}")
             logger.error(f"[ERROR] Failed to process {qvw_file.name}: {str(e)}", exc_info=True)
             end_file(report_name, "failed")
             reports_failed += 1
@@ -561,7 +552,7 @@ def report_exports(settings, logger, overwrite_existing=False, multiplier=1):
     save_qvw_cache(cache_path, cache)
 
     print(f"\n{'='*60}")
-    print(f"📑 REPORT PDF EXPORT SUMMARY: {reports_ok} ok, {reports_skipped} skipped, {reports_failed} failed")
+    print(f" REPORT PDF EXPORT SUMMARY: {reports_ok} ok, {reports_skipped} skipped, {reports_failed} failed")
     print(f"{'='*60}\n")
 
     summary = finalize(logger)
@@ -580,7 +571,7 @@ def transform_output_from_csv(settings, logger,overwrite_existing=False):
     step_failed = False
 
     print(f"\n{'='*60}")
-    print(f"📊 OUTPUT ANALYSIS (structured JSON)")
+    print(f" OUTPUT ANALYSIS (structured JSON)")
     print(f"{'='*60}")
     print(f"Scanning QVWs in: {root_folder}")
     print(f"Found {len(qvw_files)} QVW file(s) | overwrite={overwrite_existing}")
@@ -604,7 +595,7 @@ def transform_output_from_csv(settings, logger,overwrite_existing=False):
             # Case 1: Output does not exist
             if not output_analysis_file.exists():
                 logger.info(f"[NEW] Analysis output missing for {qvw_file.name}. Will generate.")
-                print(f"\n→ [NEW] Generating analysis for: {qvw_file.name}")
+                print(f"\n [NEW] Generating analysis for: {qvw_file.name}")
                 needs_processing = True
 
             # Case 2: Overwrite is enabled
@@ -612,28 +603,28 @@ def transform_output_from_csv(settings, logger,overwrite_existing=False):
                 if output_analysis_folder.exists():
                     shutil.rmtree(output_analysis_folder)
                 logger.info(f"[OVERWRITE] Forcing analysis output for: {qvw_file.name}")
-                print(f"\n→ [OVERWRITE] Regenerating analysis for: {qvw_file.name}")
+                print(f"\n [OVERWRITE] Regenerating analysis for: {qvw_file.name}")
                 needs_processing = True
 
             # Case 4: No changes
             else:
                 logger.info(f"[SKIP] Analysis already exists for {qvw_file.name}.")
-                print(f"  ⏭️  [SKIP] Analysis already exists for {qvw_file.name}")
+                print(f"    [SKIP] Analysis already exists for {qvw_file.name}")
                 end_file(report_name, "skipped")
                 reports_skipped += 1
                 continue
 
             # Execute processing
             if needs_processing:
-                print(f"  ⚙️  Generating structured JSONs under {output_analysis_folder}")
+                print(f"    Generating structured JSONs under {output_analysis_folder}")
                 generate_outputanalysis_jsons(report_folder, logger, field_mapping)
                 logger.info(f"JSON output generated for: {qvw_file.name}")
                 if output_analysis_folder.exists():
                     files_created = sorted(output_analysis_folder.glob("*"))
-                    print(f"  ✓ Created {len(files_created)} file(s) in Outputanalysis/")
+                    print(f"   Created {len(files_created)} file(s) in Outputanalysis/")
                     for f in files_created:
                         print(f"      - {f.name}")
-                print(f"  ✅ Analysis done for: {qvw_file.name}")
+                print(f"   Analysis done for: {qvw_file.name}")
                 end_file(report_name, "success")
                 reports_ok += 1
         except Exception as e:
@@ -641,10 +632,10 @@ def transform_output_from_csv(settings, logger,overwrite_existing=False):
             step_failed = True
             reports_failed += 1
             logger.error(f"Failed to process {qvw_file.name}: {str(e)}", exc_info=True)
-            print(f"  ❌ Failed analysis for {qvw_file.name}: {e}")
+            print(f"   Failed analysis for {qvw_file.name}: {e}")
 
     print(f"\n{'='*60}")
-    print(f"📊 OUTPUT ANALYSIS SUMMARY: {reports_ok} ok, {reports_skipped} skipped, {reports_failed} failed")
+    print(f" OUTPUT ANALYSIS SUMMARY: {reports_ok} ok, {reports_skipped} skipped, {reports_failed} failed")
     print(f"{'='*60}\n")
 
     finalize(logger, force_fail=step_failed)

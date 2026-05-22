@@ -10,7 +10,7 @@ The system combines traditional software automation (GUI control, XML parsing, f
 
 ## 2. Pipeline Architecture
 
-The pipeline consists of seven sequential steps, each producing intermediate artefacts consumed by downstream stages:
+The pipeline consists of six sequential steps, each producing intermediate artefacts consumed by downstream stages:
 
 ```
 .qvw (QlikView file)
@@ -30,10 +30,7 @@ The pipeline consists of seven sequential steps, each producing intermediate art
   +---> [Step 5] Expression to DAX        --> DAX measures
   |       (semantic model context + GPT-4o)
   |
-  +---> [Step 6] PDF Generation           --> PNG images per report page
-  |       (GUI automation + PDF splitting)
-  |
-  +---> [Step 7] Output Analysis           --> Unified enriched JSON
+  +---> [Step 6] Output Analysis           --> Unified enriched JSON
           (multi-source data integration)
 ```
 
@@ -164,35 +161,9 @@ The pipeline consists of seven sequential steps, each producing intermediate art
 
 ---
 
-### 3.6 Step 6 -- PDF Generation and Page Splitting
+### 3.6 Step 6 -- Output Analysis (Structured JSON Assembly)
 
-**Purpose:** Export QlikView report pages as PDF, split into individual sheet images, and extract spatial metadata.
-
-**Techniques:**
-
-1. **GUI automation**: opens each `.qvw` file and navigates QlikView's print-to-PDF workflow via keyboard automation.
-
-2. **PDF-to-image conversion**: uses PyMuPDF (`fitz`) to render each PDF page at 300 DPI as a PIL Image.
-
-3. **Image processing**:
-   - Background detection via top-left pixel sampling with colour tolerance.
-   - Background removal through RGBA manipulation (alpha channel masking).
-   - Content bounding box computation via `Image.getbbox()`.
-   - Automatic cropping to content area (removes surrounding whitespace).
-
-4. **Spatial metadata extraction**: for each page, computes absolute bounding boxes in pixels, normalised relative coordinates (0-1 scale), and physical dimensions in centimetres.
-
-**Input:** `.qvw` files + `sheets.csv`.
-
-**Output per report:**
-- `ReportPages/{page_number}_{sheet_name}.png` -- one cropped PNG per sheet
-- `ReportPages/page_dimensions.json` -- spatial metadata per page
-
----
-
-### 3.7 Step 7 -- Output Analysis (Structured JSON Assembly)
-
-**Purpose:** Synthesize all intermediate outputs from Steps 1-6 into unified, enriched JSON files suitable for downstream validation and Power BI report construction.
+**Purpose:** Synthesize all intermediate outputs from Steps 1-5 into unified, enriched JSON files suitable for downstream validation and Power BI report construction.
 
 **Techniques:**
 - **Multi-source data integration**: loads up to 9 CSV sources and performs SQL-like joins using pandas `merge()`:
@@ -208,7 +179,6 @@ The pipeline consists of seven sequential steps, each producing intermediate art
 **Output in `Outputanalysis/`:**
 - `enriched_dax.json` -- objects enriched with sheet names, PBI types, and DAX expressions
 - `m_query_output.json` -- M Query scripts in JSON format
-- `report_pages.json` -- list of PNG image paths from Step 6
 
 ---
 
@@ -221,8 +191,33 @@ The pipeline consists of seven sequential steps, each producing intermediate art
 | **AI/LLM** | Azure OpenAI GPT-4o (chat completions), text-embedding-3-small |
 | **GUI Automation** | pyautogui, pygetwindow |
 | **Data Processing** | pandas, xmltodict, chardet, csv, json |
-| **PDF/Image** | PyMuPDF (fitz), Pillow (PIL) |
 | **Embeddings/RAG** | OpenAI embeddings + cosine similarity (numpy) |
+
+---
+
+### 3.7 Step 7 -- Migration Complexity Analysis
+
+**Purpose:** Quantitatively assess the complexity of each QlikView report to estimate migration effort and prioritise reports for migration.
+
+**Techniques:**
+
+1. **Feature engineering**: 27 quantitative features extracted from 7 data sources across four analytical dimensions:
+   - **Data Model (30%)**: field count, key field count, measure field count, average cardinality, multi-table fields, type diversity.
+   - **Expressions (25%)**: expression count, average length, set analysis presence, nesting depth, aggregation diversity, DAX translation gap.
+   - **Script (25%)**: line count, LOAD/JOIN/RESIDENT counts, subroutine and loop presence, tab count.
+   - **Layout (20%)**: object count, sheet count, max objects per sheet, unique object types, chart count, dimension count.
+
+2. **Min-max normalisation with predefined reference ranges**: unlike data-driven normalisation (z-score, percentiles), reference ranges are defined from domain knowledge of QlikView migration projects. This enables valid scoring with a single report (N=1), following the approach of software complexity indices (McCabe, 1976; Halstead, 1977).
+
+3. **Two-level weighted aggregation**: features are combined within each dimension using intra-category weights, then dimensions are combined using inter-category weights to produce an overall score (0-100).
+
+4. **Classification and effort estimation**: scores are classified into Low (<25), Medium (25-50), High (50-75), and Critical (>75), with person-day estimates per tier.
+
+5. **Contextual recommendations**: rules-based recommendation generation identifies specific risk factors (JOINs, loops, subroutines, dense layouts) and suggests mitigation strategies.
+
+**Input:** All CSV outputs from Steps 1-6.
+
+**Output:** Complexity report with overall score, dimension scores, feature breakdown, classification, effort estimate, and recommendations.
 
 ---
 
@@ -239,9 +234,7 @@ The pipeline genuinely synthesises information from multiple heterogeneous sourc
 - **QlikView internal metadata** (XML object descriptors, CSV tables, load scripts) -- extracted via GUI automation since QlikView provides no API.
 - **Domain knowledge bases** (field mapping tables, RAG example corpora) -- curated translation references that ground LLM outputs in domain-specific patterns.
 - **AI model outputs** (LLM-generated M Query code, DAX measures) -- synthesised with structural metadata to produce validated migration artefacts.
-- **Visual report data** (PDF exports, page images, spatial metadata) -- combined with textual metadata for structured output.
-
-The Output Analysis step (Step 7) exemplifies this synthesis: it joins up to 9 distinct data sources through a series of relational operations to produce a unified enriched representation that no single source could provide alone.
+The Output Analysis step (Step 6) exemplifies this synthesis: it joins up to 9 distinct data sources through a series of relational operations to produce a unified enriched representation that no single source could provide alone.
 
 **This LO is well-supported.** The pipeline addresses a real integration challenge across incompatible data formats.
 
@@ -318,39 +311,44 @@ The pipeline provides artefacts that support technical reporting:
 
 - **Problem**: manual QlikView-to-Power-BI migration is time-consuming, error-prone, and does not scale.
 - **Motivation**: organisations face hundreds of reports with thousands of expressions that must be faithfully translated.
-- **Methodology**: a seven-step pipeline that decomposes migration into tractable sub-problems.
+- **Methodology**: a six-step pipeline that decomposes migration into tractable sub-problems.
 
 **Gap:** the "findings" are currently limited to success/failure counts per step. There are no quantitative findings about translation quality, no statistical analysis of results, and no empirical comparison of approaches. A Master's report requires measurable, reproducible findings -- not just "the pipeline ran successfully."
 
 ---
 
-## 6. Gap Analysis: What the Project Lacks for a Data Science Master's
+## 6. Data Science Contributions
 
-### 6.1 No Data Mining Algorithms
+### 6.1 Migration Complexity Analysis (Implemented)
 
-The project contains **zero** implementations of:
-- Clustering (K-Means, DBSCAN, hierarchical)
-- Classification (logistic regression, SVM, decision trees, random forests)
-- Regression (linear, polynomial, neural)
-- Association rules (Apriori, FP-Growth)
-- Anomaly detection (Isolation Forest, LOF)
-- Dimensionality reduction (PCA, t-SNE, UMAP)
+Step 8 introduces a quantitative feature engineering and multi-criteria scoring system:
+- **27 features** extracted from 7 heterogeneous data sources via regex, pandas aggregation, and statistical analysis
+- **Min-max normalisation** with domain-specific predefined reference ranges (following McCabe/Halstead tradition)
+- **Two-level weighted aggregation** producing a composite complexity index (0-100)
+- **Rule-based classification** into effort tiers with contextual recommendation generation
 
-### 6.2 No Model Training
+This module is deterministic, reproducible, and does not depend on external APIs.
 
-Every "AI" component calls a pre-trained commercial API (Azure OpenAI). There is no:
-- Custom model training or fine-tuning
-- Hyperparameter optimisation
-- Cross-validation
-- Train/test split methodology
+### 6.2 RAG Pipeline for Code Translation (Implemented)
 
-### 6.3 No Quantitative Evaluation
+Step 4 implements a practical Retrieval-Augmented Generation system:
+- **Embedding-based similarity search** using text-embedding-3-small (1536 dimensions) + cosine similarity
+- **Few-shot learning** via retrieved domain-specific examples injected into LLM prompts
+- **Knowledge base construction** with persistent embedding index
 
-There are no metrics measuring:
-- Translation correctness (precision, recall, F1)
-- Code similarity (BLEU, CodeBLEU, AST edit distance)
-- Statistical significance of results
-- Comparison against baselines
+### 6.3 Semantic Model Inference (Implemented)
+
+Step 5 extracts a data model schema from metadata:
+- **Heuristic type inference** from QlikView field tags ($key, $numeric, $date → DAX types)
+- **Relationship discovery** via multi-table field analysis (FieldTableCount > 1)
+- **Schema context injection** enabling semantically-aware LLM translations
+
+### 6.4 Potential Extensions
+
+The following additions could further strengthen the data science component:
+- **Translation quality evaluation**: BLEU/CodeBLEU scores, ablation studies (RAG vs. zero-shot)
+- **Object clustering**: unsupervised grouping of QlikView objects via K-Means on extracted features
+- **Expression complexity prediction**: supervised classification to predict DAX translation difficulty
 
 ---
 
@@ -504,5 +502,5 @@ For a defensible Master's thesis, implement **at least Proposals A and D**:
 | 3 | Lookup table | Pandas merge | QlikView to Power BI type mapping |
 | 4 | RAG + LLM | text-embedding-3-small + GPT-4o | QVS script to M Query translation |
 | 5 | LLM + type inference | GPT-4o + heuristic mapping | Expression to DAX measure translation |
-| 6 | Image processing | PyMuPDF + PIL | PDF to cropped PNG with spatial metadata |
-| 7 | Data integration | Pandas multi-join | Multi-source synthesis to enriched JSON |
+| 6 | Data integration | Pandas multi-join | Multi-source synthesis to enriched JSON |
+| 7 | Feature engineering + multi-criteria scoring | Min-max normalisation + weighted aggregation | Migration complexity analysis and effort estimation |

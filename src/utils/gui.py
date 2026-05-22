@@ -100,7 +100,7 @@ def automate_qlikview(document_analyzer_path, analysis_path, logger, multiplier=
 
         # Fallback hardcoded coordinates (1920x1080 baseline) — only used
         # when image recognition can't find the UI element.
-        path_input_coords = {'x': 162, 'y': 232}
+        path_input_coords = {'x': 162, 'y': 198}
         extract_button_coords = {'x': 122, 'y': 525}
         open_log_button_coords = {'x': 319, 'y': 515}
 
@@ -125,34 +125,38 @@ def automate_qlikview(document_analyzer_path, analysis_path, logger, multiplier=
                     print(f"  QlikView window found after ~{(i+1)*0.5:.1f}s")
                     break
                 if (i + 1) % 10 == 0:
-                    print(f"  ⏳ Still waiting for QlikView to open... ({(i+1)*0.5:.0f}s)")
+                    print(f"   Still waiting for QlikView to open... ({(i+1)*0.5:.0f}s)")
             if qlikview_window is None:
                 raise Exception(f"Could not find QlikView window after 30s — title containing '{window_title_part}'")
             time.sleep(1.5)  # small buffer for the document UI to render
 
         qlikview_window.maximize()
-        time.sleep(0.3 * multiplier)
+        time.sleep(2 * multiplier)
         qlikview_window.moveTo(0, 0)
         qlikview_window.resizeTo(current_width, current_height)
-        time.sleep(0.4 * multiplier)
+        time.sleep(3 * multiplier)
         qlikview_window.activate()
-        time.sleep(0.2 * multiplier)
+        time.sleep(3 * multiplier)
 
         # --- Click the path input field ---
         anchor = _find_on_screen("path_input_anchor.png", logger)
         if anchor is not None:
-            input_x, input_y = int(anchor.x), int(anchor.y) + 20
+            input_x, input_y = int(anchor.x), int(anchor.y) + 40
+            print("found")
         else:
             input_x, input_y = path_input_coords['x'], path_input_coords['y']
+            print("not found")
+
             logger.warning(f"Falling back to hardcoded path input coords: ({input_x},{input_y})")
 
         pyautogui.click(input_x, input_y)
-        time.sleep(0.2 * multiplier)
+        time.sleep(1 * multiplier)
         pyautogui.hotkey('ctrl', 'a')
-        time.sleep(0.1 * multiplier)
+        time.sleep(0.5 * multiplier)
         pyautogui.press('delete')
-        time.sleep(0.1 * multiplier)
-        pyautogui.write(analysis_path, interval=0.005)
+        time.sleep(0.5 * multiplier)
+        pyautogui.write(analysis_path, interval=0.02)
+        time.sleep(1 * multiplier)
         pyautogui.press('enter')
         logger.info(f"Entered analysis path: {analysis_path}")
 
@@ -166,7 +170,7 @@ def automate_qlikview(document_analyzer_path, analysis_path, logger, multiplier=
 
         pyautogui.click(extract_x, extract_y)
         logger.info("Clicked Extract Metadata button — waiting for DocumentAnalyzer to process")
-        time.sleep(5 * multiplier)
+        time.sleep(15 * multiplier)
 
         try:
             auth_user_popup = pyautogui.locateOnScreen(
@@ -180,7 +184,9 @@ def automate_qlikview(document_analyzer_path, analysis_path, logger, multiplier=
             handle_auth_user_popup()
         else:
             pyautogui.press('enter')
-            # Wait for Reload dialog / script execution to finish
+            time.sleep(8 * multiplier)
+
+            # Wait for reload/script execution to finish
             time.sleep(5 * multiplier)
 
             # --- Click the "Open doc log" button ---
@@ -192,6 +198,7 @@ def automate_qlikview(document_analyzer_path, analysis_path, logger, multiplier=
                 logger.warning(f"Falling back to hardcoded Open doc log coords: ({open_log_x},{open_log_y})")
 
             pyautogui.click(open_log_x, open_log_y)
+            time.sleep(3 * multiplier)
             logger.info("Clicked Open doc log button")
 
     except Exception as e:
@@ -211,29 +218,37 @@ def close_qv_window(logger):
         window_title_part = "QlikView x64 Personal Edition"
         windows = gw.getWindowsWithTitle(window_title_part)
         if not windows:
-            raise Exception(f"Could not find QlikView window with title containing '{window_title_part}'")
+            logger.info("No QlikView window found to close — already closed.")
+            return
 
         qlikview_window = windows[0]
         qlikview_window.activate()
-        time.sleep(1)  # Give it time to activate
+        time.sleep(2)
 
-        qlikview_window.close()  # Trigger close
-        time.sleep(1)  # Wait for prompt to appear
+        qlikview_window.close()
+        time.sleep(3)
 
-        pyautogui.press('right')  # Select 'No'
-        time.sleep(0.2)
-        pyautogui.press('enter')  # Confirm
+        pyautogui.press('right')
+        time.sleep(1)
+        pyautogui.press('enter')
+        time.sleep(2)
 
-        if logger:
-            logger.info(f"Closed QlikView window with title containing '{window_title_part}'")
-        else:
-            logger.info(f"Closed QlikView window with title containing '{window_title_part}'")
+        # Verify it actually closed
+        remaining = gw.getWindowsWithTitle(window_title_part)
+        if remaining:
+            logger.warning("QlikView window still open after close attempt, force-closing with Alt+F4")
+            remaining[0].activate()
+            time.sleep(1)
+            pyautogui.hotkey('alt', 'F4')
+            time.sleep(2)
+            pyautogui.press('right')
+            time.sleep(1)
+            pyautogui.press('enter')
+            time.sleep(2)
+
+        logger.info("QlikView window closed successfully")
     except Exception as e:
-        if logger:
-            logger.error("Failed to close QlikView window", exc_info=True)
-        else:
-            logger.info(f"Error closing QlikView window: {e}")
-        raise
+        logger.error(f"Failed to close QlikView window: {e}", exc_info=True)
 
 
 def automate_qlikview_report_to_pdf(qvw_path, output_pdf_path, logger, multiplier=1):
@@ -243,18 +258,18 @@ def automate_qlikview_report_to_pdf(qvw_path, output_pdf_path, logger, multiplie
         pdf_dir = os.path.dirname(output_pdf_path)
         os.makedirs(pdf_dir, exist_ok=True)
 
-        print(f"    📂 PDF output dir: {pdf_dir}")
-        print(f"    📄 Expected PDF: {output_pdf_path}")
+        print(f"     PDF output dir: {pdf_dir}")
+        print(f"     Expected PDF: {output_pdf_path}")
 
         logger.info(f"Opening QlikView file: {qvw_path}")
         if not os.path.exists(qvw_path):
             raise FileNotFoundError(f"QlikView file not found: {qvw_path}")
 
-        print(f"    🚀 Launching QlikView with: {qvw_path}")
+        print(f"     Launching QlikView with: {qvw_path}")
         subprocess.Popen(str(qvw_path), shell=True)
 
         # Poll for the window — allow up to ~30s for QlikView to open
-        print(f"    ⏳ Polling for QlikView window (up to 30s)...")
+        print(f"     Polling for QlikView window (up to 30s)...")
         qv_windows = []
         for i in range(60):  # 60 × 0.5s = 30s max
             time.sleep(0.5)
@@ -264,16 +279,16 @@ def automate_qlikview_report_to_pdf(qvw_path, output_pdf_path, logger, multiplie
                                        w.title.endswith('.qvw') or
                                        'qv' in w.title.lower())]
             if qv_windows:
-                print(f"    ✓ QlikView window found after ~{(i+1)*0.5:.1f}s: '{qv_windows[0].title}'")
+                print(f"     QlikView window found after ~{(i+1)*0.5:.1f}s: '{qv_windows[0].title}'")
                 break
             if (i + 1) % 10 == 0:
                 visible_titles = [w.title for w in all_windows if w.title.strip()][:10]
-                print(f"    ⏳ Still waiting... ({(i+1)*0.5:.0f}s) — visible windows: {visible_titles}")
+                print(f"     Still waiting... ({(i+1)*0.5:.0f}s) — visible windows: {visible_titles}")
 
         if not qv_windows:
             all_titles = [w.title for w in gw.getAllWindows() if w.title.strip()]
-            print(f"    ❌ No QlikView window found after 30s")
-            print(f"    📋 All visible windows: {all_titles}")
+            print(f"     No QlikView window found after 30s")
+            print(f"     All visible windows: {all_titles}")
             raise Exception(f"No QlikView window found after 30s. Visible windows: {all_titles}")
 
         # Use the first QlikView window found
@@ -281,12 +296,12 @@ def automate_qlikview_report_to_pdf(qvw_path, output_pdf_path, logger, multiplie
         logger.info(f"Found QlikView window: {qv_window.title}")
 
         # Focus the window
-        print(f"    🔲 Activating window: '{qv_window.title}'")
+        print(f"     Activating window: '{qv_window.title}'")
         qv_window.activate()
         time.sleep(3)
 
         # Proceed with automation
-        print(f"    ⚙️  Starting menu automation (Alt → File → Print to PDF)...")
+        print(f"      Starting menu automation (Alt  File  Print to PDF)...")
 
         # 1. Alt → File menu
         print(f"      [1/7] Pressing Alt to open menu bar")
@@ -294,19 +309,19 @@ def automate_qlikview_report_to_pdf(qvw_path, output_pdf_path, logger, multiplie
         time.sleep(2)
 
         # 2. Tab 9 times to select "Object"
-        print(f"      [2/7] Tab×9 → navigating to File menu")
+        print(f"      [2/7] Tab×9  navigating to File menu")
         pyautogui.press('tab', presses=9, interval=1)
         pyautogui.press('enter')
         time.sleep(2 * multiplier)
 
         # 3. Tab 6 times to "Print as PDF"
-        print(f"      [3/7] Tab×6 → navigating to 'Print to PDF'")
+        print(f"      [3/7] Tab×6  navigating to 'Print to PDF'")
         pyautogui.press('tab', presses=6, interval=1)
         pyautogui.press('enter')
         time.sleep(2 * multiplier)
 
         # 4. Tab 5 times, then Down arrow to "All pages"
-        print(f"      [4/7] Tab×5 + Down → selecting 'All pages'")
+        print(f"      [4/7] Tab×5 + Down  selecting 'All pages'")
         pyautogui.press('tab', presses=5, interval=1)
         time.sleep(1 * multiplier)
         pyautogui.press('down')
@@ -320,7 +335,7 @@ def automate_qlikview_report_to_pdf(qvw_path, output_pdf_path, logger, multiplie
         pyautogui.write(f"Pages_{report_name}")
 
         # 6. Tab 6 times to folder path input, then Enter
-        print(f"      [6/7] Tab×6 → navigating to folder path input")
+        print(f"      [6/7] Tab×6  navigating to folder path input")
         pyautogui.press('tab', presses=6, interval=1)
         pyautogui.press('enter')
         time.sleep(2)
@@ -334,14 +349,14 @@ def automate_qlikview_report_to_pdf(qvw_path, output_pdf_path, logger, multiplie
         pyautogui.press('enter')
 
         # Wait for PDF to finish saving
-        print(f"    ⏳ Waiting for PDF to finish saving...")
+        print(f"     Waiting for PDF to finish saving...")
         logger.info("Waiting for PDF to finish saving and become stable...")
         wait_for_pdf_stable_size(output_pdf_path, logger=logger)
-        print(f"    ✅ PDF saved: {output_pdf_path}")
+        print(f"     PDF saved: {output_pdf_path}")
 
     except Exception as e:
         logger.error(f"PDF export failed for {qvw_path}", exc_info=True)
-        print(f"    ❌ PDF export failed: {type(e).__name__}: {e}")
+        print(f"     PDF export failed: {type(e).__name__}: {e}")
         raise
 
 

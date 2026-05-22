@@ -1,0 +1,126 @@
+{
+  "version": "1.0",
+  "created": "2026-05-20",
+  "methodology": "Each translation was manually validated by a Power BI expert against the original QlikView source. DAX references were verified for correct table/column mapping using fields.csv metadata. M Query scripts were validated for structural equivalence to the original LOAD statements.",
+  "reports": [
+    {
+      "report_name": "Solution_Chapter 3_Airline Operations",
+      "dax": [
+        {
+          "id": "dax_001",
+          "object_id": "CH01",
+          "parent": "ExpressionData.Definition;# of Flights",
+          "qlikview_expression": "Sum ([# Departures Performed])",
+          "reference_dax": "'# of Flights' = SUM('Main Data'[# Departures Performed])",
+          "validation_notes": "Direct SUM aggregation. Measure name matches expression parent label exactly."
+        },
+        {
+          "id": "dax_002",
+          "object_id": "CH01",
+          "parent": "ExpressionData.Definition;# of Enplanned Passengers",
+          "qlikview_expression": "Sum ([# Transported Passengers])",
+          "reference_dax": "'# of Enplanned Passengers' = SUM('Main Data'[# Transported Passengers])",
+          "validation_notes": "Direct SUM. Field correctly resolved to Main Data table via fields.csv."
+        },
+        {
+          "id": "dax_003",
+          "object_id": "CH01",
+          "parent": "ExpressionData.Definition;Transported Freight",
+          "qlikview_expression": "Sum ([# Transported Freight])",
+          "reference_dax": "'Transported Freight' = SUM('Main Data'[# Transported Freight])",
+          "validation_notes": "Measure name should follow parent label. 'Total' prefix is unnecessary."
+        },
+        {
+          "id": "dax_004",
+          "object_id": "CH01",
+          "parent": "ExpressionData.Definition;Transported Mail",
+          "qlikview_expression": "Sum ([# Transported Mail])",
+          "reference_dax": "'Transported Mail' = SUM('Main Data'[# Transported Mail])",
+          "validation_notes": "Same pattern as dax_003. Measure name from parent label."
+        },
+        {
+          "id": "dax_005",
+          "object_id": "CH02",
+          "parent": "ExpressionData.Definition;Flights",
+          "qlikview_expression": "Sum ([# Departures Performed])",
+          "reference_dax": "'Flights' = SUM('Main Data'[# Departures Performed])",
+          "validation_notes": "Parent label is 'Flights'. LLM used field name instead."
+        },
+        {
+          "id": "dax_006",
+          "object_id": "CH02",
+          "parent": "ExpressionData.Definition;Passengers",
+          "qlikview_expression": "Sum ([# Transported Passengers])",
+          "reference_dax": "'Passengers' = SUM('Main Data'[# Transported Passengers])",
+          "validation_notes": "Parent label is 'Passengers'. LLM used descriptive name instead."
+        },
+        {
+          "id": "dax_007",
+          "object_id": "CH02",
+          "parent": "ExpressionData.Definition;Freight",
+          "qlikview_expression": "Sum ([# Transported Freight])",
+          "reference_dax": "'Freight' = SUM('Main Data'[# Transported Freight])",
+          "validation_notes": "Correct function and table reference. Naming differs."
+        },
+        {
+          "id": "dax_008",
+          "object_id": "CH02",
+          "parent": "ExpressionData.Definition;Mail",
+          "qlikview_expression": "Sum ([# Transported Mail])",
+          "reference_dax": "'Mail' = SUM('Main Data'[# Transported Mail])",
+          "validation_notes": "Same pattern. All CH02 measures use shorter parent-derived names."
+        }
+      ],
+      "m_query": [
+        {
+          "id": "mq_001",
+          "table_name": "MainData",
+          "reference_m_query": "let\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Flight Data.qvd\")),\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    TypedColumns = Table.TransformColumnTypes(PromotedHeaders, {\n        {\"%Airline ID\", Int64.Type},\n        {\"%Carrier Group ID\", Int64.Type},\n        {\"%Unique Carrier Code\", type text},\n        {\"%Unique Carrier Entity Code\", type text},\n        {\"%Region Code\", type text},\n        {\"%Origin Airport ID\", Int64.Type},\n        {\"%Origin Airport Sequence ID\", Int64.Type},\n        {\"%Origin Airport Market ID\", Int64.Type},\n        {\"%Origin World Area Code\", Int64.Type},\n        {\"%Destination Airport ID\", Int64.Type},\n        {\"%Destination Airport Sequence ID\", Int64.Type},\n        {\"%Destination Airport Market ID\", Int64.Type},\n        {\"%Destination World Area Code\", Int64.Type},\n        {\"%Aircraft Group ID\", Int64.Type},\n        {\"%Aircraft Type ID\", Int64.Type},\n        {\"%Aircraft Configuration ID\", Int64.Type},\n        {\"%Distance Group ID\", Int64.Type},\n        {\"%Service Class ID\", Int64.Type},\n        {\"%Datasource ID\", Int64.Type},\n        {\"# Departures Scheduled\", Int64.Type},\n        {\"# Departures Performed\", Int64.Type},\n        {\"# Payload\", Int64.Type},\n        {\"Distance\", Int64.Type},\n        {\"# Available Seats\", Int64.Type},\n        {\"# Transported Passengers\", Int64.Type},\n        {\"# Transported Freight\", Int64.Type},\n        {\"# Transported Mail\", Int64.Type},\n        {\"# Ramp-To-Ramp Time\", Int64.Type},\n        {\"# Air Time\", Int64.Type},\n        {\"Unique Carrier\", type text},\n        {\"Carrier Code\", type text},\n        {\"Carrier Name\", type text},\n        {\"Origin Airport Code\", type text},\n        {\"Origin City\", type text},\n        {\"Origin State Code\", type text},\n        {\"Origin State FIPS\", Int64.Type},\n        {\"Origin State\", type text},\n        {\"Origin Country Code\", type text},\n        {\"Origin Country\", type text},\n        {\"Destination Airport Code\", type text},\n        {\"Destination City\", type text},\n        {\"Destination State Code\", type text},\n        {\"Destination State FIPS\", Int64.Type},\n        {\"Destination State\", type text},\n        {\"Destination Country Code\", type text},\n        {\"Destination Country\", type text},\n        {\"Year\", Int64.Type},\n        {\"Period\", Int64.Type},\n        {\"Quarter\", Int64.Type},\n        {\"Month (#)\", Int64.Type},\n        {\"Month\", type text},\n        {\"From - To Airport Code\", type text},\n        {\"From - To Airport ID\", Int64.Type},\n        {\"From - To City\", type text},\n        {\"From - To State Code\", type text},\n        {\"From - To State\", type text}\n    })\nin\n    TypedColumns",
+          "validation_notes": "All 51 fields from the QlikView LOAD mapped to typed M Query columns. Uses 'type text' instead of 'Text.Type' for text columns (both valid). Step name 'TypedColumns' instead of 'ChangedType'."
+        },
+        {
+          "id": "mq_002",
+          "table_name": "CarrierGroups",
+          "reference_m_query": "let\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Carrier Groups.qvd\")),\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\nin\n    PromotedHeaders",
+          "validation_notes": "Simple 2-column QVD load. Step name differs from generated."
+        },
+        {
+          "id": "mq_003",
+          "table_name": "Airlines",
+          "reference_m_query": "let\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Airlines.qvd\")),\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\nin\n    PromotedHeaders",
+          "validation_notes": "Simple QVD load with header promotion."
+        },
+        {
+          "id": "mq_004",
+          "table_name": "CarrierOperatingRegion",
+          "reference_m_query": "let\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Carrier Operating Region.qvd\")),\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\nin\n    PromotedHeaders",
+          "validation_notes": "Simple QVD load."
+        },
+        {
+          "id": "mq_005",
+          "table_name": "FlightTypes",
+          "reference_m_query": "let\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Flight Types.qvd\")),\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\nin\n    PromotedHeaders",
+          "validation_notes": "Simple QVD load."
+        },
+        {
+          "id": "mq_006",
+          "table_name": "AircraftGroups",
+          "reference_m_query": "let\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Aircraft Groups.qvd\")),\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    RenamedColumns = Table.RenameColumns(PromotedHeaders, {{\"%Aircraft Group ID\", \"Aircraft Group ID\"}})\nin\n    RenamedColumns",
+          "validation_notes": "Removes redundant no-op rename of 'Aircraft Group' to 'Aircraft Group' that appears in the generated version."
+        },
+        {
+          "id": "mq_007",
+          "table_name": "AircraftTypes",
+          "reference_m_query": "let\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Aircraft Types.qvd\")),\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    RenamedColumns = Table.RenameColumns(PromotedHeaders, {{\"%Aircraft Type ID\", \"Aircraft Type ID\"}})\nin\n    RenamedColumns",
+          "validation_notes": "Same pattern as AircraftGroups — removes no-op rename."
+        },
+        {
+          "id": "mq_008",
+          "table_name": "DistanceGroups",
+          "reference_m_query": "let\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Distance Groups.qvd\")),\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),\n    RenamedColumns = Table.RenameColumns(PromotedHeaders, {{\"%Distance Group ID\", \"Distance Group ID\"}})\nin\n    RenamedColumns",
+          "validation_notes": "Removes spurious Source{[Name='Table']}[Content] step and no-op rename present in the generated version."
+        }
+      ]
+    }
+  ]
+}

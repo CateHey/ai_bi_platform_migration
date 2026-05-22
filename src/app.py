@@ -18,9 +18,13 @@ from datetime import datetime
 from collections import defaultdict
 import streamlit.components.v1 as components
 import pandas as pd
+import altair as alt
 import tempfile
 from streamlit_option_menu import option_menu
 import os
+from src.utils.complexity import compute_complexity
+from src.utils.evaluation import run_evaluation
+from src.utils.io_helpers import read_csv_flexible_encoding
 
 if not CLOUD_MODE:
     from src.main import (
@@ -158,11 +162,11 @@ st.sidebar.title("Navigation")
 
 with st.sidebar:
     if CLOUD_MODE:
-        _menu_items = ["Pipeline Info", "DAX, M Query, Pages", "Power BI", "Execution History"]
-        _menu_icons = ["book", "bar-chart", "file-earmark", "gear"]
+        _menu_items = ["Pipeline Info", "DAX, M Query, Pages", "Summary Report", "Complexity Analysis", "Translation Quality", "Execution History"]
+        _menu_icons = ["book", "bar-chart", "clipboard-data", "graph-up", "check2-circle", "gear"]
     else:
-        _menu_items = ["Main App", "Pipeline Info", "DAX, M Query, Pages", "Power BI", "Execution History", "Logs"]
-        _menu_icons = ["house", "book", "bar-chart", "file-earmark", "gear", "clipboard-data"]
+        _menu_items = ["Main App", "Pipeline Info", "DAX, M Query, Pages", "Summary Report", "Complexity Analysis", "Translation Quality", "Execution History", "Logs"]
+        _menu_icons = ["house", "book", "bar-chart", "clipboard-data", "graph-up", "check2-circle", "gear", "journal-text"]
     selected = option_menu(
         "",
         _menu_items,
@@ -530,7 +534,7 @@ st.markdown("""
 
 STEP_KEY_MAPPING = {
         "Metadata Extraction": "extract_qv_metadata",
-        "PDF Generation": "report_exports",
+        # "PDF Generation": "report_exports",  # disabled — requires local GUI
         "XML Parsing": "parse_xml",
         "Field Mapping": "map_fields",
         "Data Source Creation": "generate_data_source",
@@ -548,8 +552,6 @@ def get_last_run(ui_step_name, execution_log):
     return step_data.get("last_run", "Not run yet"), step_data.get("status", "unknown")
 
 def display_log_viewer():
-    st.set_page_config(layout="wide")
-
     st.title("Log File Viewer")
     log_files = list(Path("output/logs").glob("*.log"))
     if not log_files:
@@ -590,7 +592,7 @@ def run_pipeline(full_pipeline, steps, settings, qv_metadata_settings, output_se
     client = None # Initialize client here
 
     print(f"\n{'='*60}")
-    print(f"🚀 PIPELINE START — full_pipeline={full_pipeline}")
+    print(f"PIPELINE START -- full_pipeline={full_pipeline}")
     print(f"   Step selections: {steps}")
     print(f"{'='*60}\n")
 
@@ -607,7 +609,7 @@ def run_pipeline(full_pipeline, steps, settings, qv_metadata_settings, output_se
                 "Field Mapping": "map_fields",
                 "Data Source Creation": "generate_data_source",
                 "Expression to DAX": "generate_expression_to_dax",
-                "PDF Generation": "report_exports",
+                # "PDF Generation": "report_exports",  # disabled
                 "Output analysis": "transform_output_from_csv",
                 # "Comparison QlikView vs Power BI": "compare_qlikview_powerbi_reports",  # Step 8 disabled
             }
@@ -660,16 +662,16 @@ def run_pipeline(full_pipeline, steps, settings, qv_metadata_settings, output_se
 
                     if should_overwrite:
                         st.write(f"🏃 Running {step_name} with overwrite...")
-                        print(f"▶ [{step_name}] executing with overwrite=True")
+                        print(f"[{step_name}] executing with overwrite=True")
                         overwrite_func(**kwargs, overwrite_existing=True)
                         report_step_outcome(step_name, overwrite_msg)
                     elif should_run:
                         st.write(f"🏃 Running {step_name}...")
-                        print(f"▶ [{step_name}] executing")
+                        print(f"[{step_name}] executing")
                         func(**kwargs)
                         report_step_outcome(step_name, success_msg)
                     else:
-                        print(f"⏭️  [{step_name}] skipped (condition={condition}, full_pipeline={full_pipeline})")
+                        print(f"[{step_name}] skipped (condition={condition}, full_pipeline={full_pipeline})")
                 except Exception as step_err:
                     st.error(
                         f"❌ {step_name} crashed: `{type(step_err).__name__}: {step_err}`\n\n"
@@ -716,11 +718,11 @@ def run_pipeline(full_pipeline, steps, settings, qv_metadata_settings, output_se
                              generate_expression_to_dax, "DAX translation done.",
                              generate_expression_to_dax, "DAX translation with overwrite done.",
                              model_name="gpt-4o", client=client, settings=settings, logger=expression_logger)
-            # PDF Generation
-            execute_step("PDF Generation", steps.get("PDF Generation"),
-                         report_exports, "PDF generation done.",
-                         report_exports, "PDF generation with overwrite done.",
-                         settings=settings, logger=report_pages_logger)
+            # PDF Generation (disabled — requires local GUI automation)
+            # execute_step("PDF Generation", steps.get("PDF Generation"),
+            #              report_exports, "PDF generation done.",
+            #              report_exports, "PDF generation with overwrite done.",
+            #              settings=settings, logger=report_pages_logger)
             # Output analysis
             execute_step("Output analysis", steps.get("Output analysis"),
                          transform_output_from_csv, "Output analysis done.",
@@ -744,7 +746,7 @@ STEP_DESCRIPTIONS = {
     "Field Mapping": "Map QlikView fields to Power BI.",
     "Data Source Creation": "Generate M queries from QVS.",
     "Expression to DAX": "Translate expressions into DAX.",
-    "PDF Generation": "Export report pages as PDF.",
+    # "PDF Generation": "Export report pages as PDF.",  # disabled — requires local GUI
     "Output analysis": "Transform CSV outputs for review.",
     # "Comparison QlikView vs Power BI": "Compare source and target reports.",
 }
@@ -841,7 +843,6 @@ def load_execution_log(settings):
     return {}
 
 def display_pipeline_info():
-    st.set_page_config(layout="wide")
     st.title("Pipeline Overview")
     st.markdown(
         "This project implements an **end-to-end automated pipeline** that migrates "
@@ -869,10 +870,7 @@ def display_pipeline_info():
         "  +---> [Step 5] Expression to DAX        --> DAX measures\n"
         "  |       (semantic model context + GPT-4o)\n"
         "  |\n"
-        "  +---> [Step 6] PDF Generation           --> PNG images per report page\n"
-        "  |       (GUI automation + PDF splitting)\n"
-        "  |\n"
-        "  +---> [Step 7] Output Analysis          --> Unified enriched JSON\n"
+        "  +---> [Step 6] Output Analysis          --> Unified enriched JSON\n"
         "          (multi-source data integration)",
         language=None,
     )
@@ -951,60 +949,45 @@ def display_pipeline_info():
             "correct but semantically wrong DAX."
         )
 
-    with st.expander("Step 6 — PDF Generation and Page Splitting", expanded=False):
+    with st.expander("Step 6 — Output Analysis (Structured JSON Assembly)", expanded=False):
         st.markdown(
-            "**Purpose:** Export QlikView report pages as PDF, split into individual sheet images, "
-            "and extract spatial metadata.\n\n"
-            "**Techniques:**\n"
-            "- GUI automation for QlikView's print-to-PDF workflow\n"
-            "- PDF-to-image conversion using PyMuPDF (`fitz`) at 300 DPI\n"
-            "- Image processing: background detection, alpha masking, content cropping\n"
-            "- Spatial metadata: bounding boxes in pixels, normalised coordinates (0-1), "
-            "physical dimensions in cm\n\n"
-            "**Input:** `.qvw` files + `sheets.csv`\n\n"
-            "**Output:** `ReportPages/{page}_{sheet}.png`, `page_dimensions.json`"
-        )
-
-    with st.expander("Step 7 — Output Analysis (Structured JSON Assembly)", expanded=False):
-        st.markdown(
-            "**Purpose:** Synthesize all intermediate outputs from Steps 1-6 into unified, "
+            "**Purpose:** Synthesize all intermediate outputs from Steps 1-5 into unified, "
             "enriched JSON files for validation and Power BI report construction.\n\n"
             "**Techniques:**\n"
             "- Multi-source data integration: loads up to 9 CSV sources with pandas `merge()`\n"
             "- Graceful degradation: processes everything available even when some sources are missing\n\n"
             "**Input:** All CSV outputs from prior steps\n\n"
-            "**Output:** `enriched_dax.json`, `m_query_output.json`, `report_pages.json`"
+            "**Output:** `enriched_dax.json`, `m_query_output.json`"
         )
 
     st.subheader("Technologies and Libraries")
     st.table(pd.DataFrame({
         "Category": [
             "Language", "Web UI", "AI / LLM", "GUI Automation",
-            "Data Processing", "PDF / Image", "Embeddings / RAG",
+            "Data Processing", "Embeddings / RAG",
         ],
         "Technologies": [
             "Python 3.11+",
             "Streamlit (interactive dashboard with step selection, monitoring, results viewer)",
-            "Azure OpenAI GPT-4o (chat completions + vision), text-embedding-3-small",
+            "Azure OpenAI GPT-4o (chat completions), text-embedding-3-small",
             "pyautogui, pygetwindow",
             "pandas, xmltodict, chardet, csv, json",
-            "PyMuPDF (fitz), Pillow (PIL)",
             "OpenAI embeddings + cosine similarity (numpy)",
         ],
     }))
 
     st.subheader("AI / Data Science Techniques by Step")
     st.table(pd.DataFrame({
-        "Step": ["1", "2", "3", "4", "5", "6", "7"],
+        "Step": ["1", "2", "3", "4", "5", "6"],
         "Technique": [
             "Template matching", "Recursive flattening", "Lookup table",
-            "RAG + LLM", "LLM + type inference", "Image processing",
+            "RAG + LLM", "LLM + type inference",
             "Data integration",
         ],
         "Model / Algorithm": [
             "pyautogui (OpenCV)", "Custom DFS", "Pandas merge",
             "text-embedding-3-small + GPT-4o", "GPT-4o + heuristic mapping",
-            "PyMuPDF + PIL", "Pandas multi-join",
+            "Pandas multi-join",
         ],
         "Purpose": [
             "Resolution-independent UI element detection",
@@ -1012,15 +995,12 @@ def display_pipeline_info():
             "QlikView to Power BI type mapping",
             "QVS script to M Query translation",
             "Expression to DAX measure translation",
-            "PDF to cropped PNG with spatial metadata",
             "Multi-source synthesis to enriched JSON",
         ],
     }))
 
 
 def display_main_app():
-    st.set_page_config(layout="wide")
-
     settings_path = Path("settings.json")
     if not settings_path.is_file():
         st.error("❌ settings.json not found")
@@ -1122,8 +1102,6 @@ def display_main_app():
             st.warning("Please enter both FedAuth and rtFa cookies to proceed.")
 
 def display_results():
-    st.set_page_config(layout="wide")
-
     st.title("Analysis Results for QlikView to Power BI Migration")
 
     output_root = Path(settings.get("output_qv_restructured_folder_path", ""))
@@ -1163,9 +1141,8 @@ def display_results():
 
         # Outer collapsible section per file
         with st.expander(f"📁 Analysis: {qvw_name}", expanded=False):
-            dax_tab, m_tab, img_tab = st.tabs(["🧠 DAX Expressions", "📄 M Queries per Table", "🖼️ Report Pages"])
+            dax_tab, m_tab = st.tabs(["DAX Expressions", "M Queries per Table"])
 
-            # Tab 1: DAX
             with dax_tab:
                 dax_path = output_restructured_folder / "DAX_output.csv"
                 if dax_path.exists():
@@ -1174,9 +1151,8 @@ def display_results():
                     joined_text = "\n\n".join(lines)
                     st.code(joined_text, language="powerquery")
                 else:
-                    st.warning("⚠️ DAX_output.csv not found.")
+                    st.warning("DAX_output.csv not found. Run Step 5 first.")
 
-            # Tab 2: M Queries
             with m_tab:
                 m_query_path = analysis_folder / "m_query_output.json"
                 if m_query_path.exists():
@@ -1186,61 +1162,292 @@ def display_results():
                     for entry in m_queries:
                         table = entry.get("TableName", "")
                         query = entry.get("MQueryScript", "")
-                        with st.expander(f"📘 {table}", expanded=False):
+                        with st.expander(f"{table}", expanded=False):
                             st.code(query, language="powerquery")
                 else:
-                    st.warning("⚠️ m_query_output.json not found.")
-
-            # Tab 3: Report Pages
-            with img_tab:
-                report_pages_path = analysis_folder / "report_pages.json"
-                report_pages_dir = output_restructured_folder / "ReportPages"
-                render_report_pages(report_pages_path, report_pages_dir)
+                    st.warning("m_query_output.json not found. Run Step 7 first.")
 
 def display_report():
+    st.title("Summary Report")
 
-    power_bi_public_url = "https://app.powerbi.com/reportEmbed?reportId=a2b711ad-4463-4a59-8b2e-01ae47d1ed39&autoAuth=true&ctid=d9854e81-0a71-43d4-9753-46cc066c1841"
-    st.set_page_config(layout="wide")
+    output_root = Path(settings.get("output_qv_restructured_folder_path", ""))
+    if not output_root.exists():
+        st.error("Output path not found.")
+        return
 
-    st.markdown("""
-        <style>
-        
-        .block-container {
-            padding: 0rem;
-            margin-right: 3vw;
-        }
+    if CLOUD_MODE:
+        report_folders = sorted([
+            d for d in output_root.iterdir()
+            if d.is_dir() and (d / "fields.csv").exists()
+        ])
+    else:
+        input_folder = Path(settings.get("root_folder_path", ""))
+        if not input_folder.exists():
+            st.error("Input root path is invalid.")
+            return
+        qvw_files = sorted(input_folder.glob("*.qvw"))
+        report_folders = [output_root / qvw_file.stem for qvw_file in qvw_files]
 
-        .full-width-container {
-            position: relative;
-            width: 85vw;
-            height: 85vh;
-            margint-right: 1vw;
-            margin-left: 3vw;
-            margin-top: 5vh;
-        }
+    if not report_folders:
+        st.warning("No report data found. Run the pipeline first.")
+        return
 
-        .report-title {
-            font-size: 2rem;
-            font-weight: 800;
-            margin-top: 3vh;
-            margin-bottom: 1vh;
-        }
+    def _load(folder, filename):
+        path = folder / filename
+        if not path.exists():
+            return None
+        df = read_csv_flexible_encoding(path)
+        df.columns = df.columns.str.strip()
+        for col in df.select_dtypes(include="object").columns:
+            df[col] = df[col].astype(str).str.strip()
+        return df
 
-        .responsive-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            box-shadow: 0 0 12px rgba(0,0,0,0.1);
-        }
-        </style>
-        <div class="full-width-container">
-            <div class="report-title">View the Live Power BI Report</div>
-            <iframe src="https://app.powerbi.com/reportEmbed?reportId=5141ab03-1b0c-4ecb-b79f-0b4afe3fb11a&autoAuth=true&ctid=d9854e81-0a71-43d4-9753-46cc066c1841" allowfullscreen="true" style="width: 95%; height: 95%; border: none;"></iframe>
-        </div>
-    """, unsafe_allow_html=True)
+    def _hbar(df, x, y, title, color="#7c3aed"):
+        bars = alt.Chart(df).mark_bar(
+            color=color, cornerRadiusEnd=4
+        ).encode(
+            x=alt.X(f"{x}:Q", title=None),
+            y=alt.Y(f"{y}:N", sort="-x", title=None),
+        )
+        labels = bars.mark_text(
+            align="left", dx=4, color="#c4b5fd", fontSize=13, fontWeight="bold"
+        ).encode(text=f"{x}:Q")
+        return (bars + labels).properties(
+            title=alt.TitleParams(text=title, color="#e9d5ff", fontSize=16, anchor="start"),
+            height=max(len(df) * 32, 120),
+        ).configure_view(strokeWidth=0).configure(
+            background="transparent",
+        ).configure_axis(
+            labelColor="#c4b5fd", titleColor="#c4b5fd", gridColor="#2a1065",
+            labelFontSize=13,
+        )
+
+    OBJ_LABELS = {
+        1: "Filter / Dropdown", 2: "Static Box", 3: "Multi-select Filter",
+        4: "Data Table", 5: "Input Box", 6: "Active Selection",
+        7: "Gauge", 10: "Chart", 11: "Pivot Table", 12: "Data Table",
+        13: "Stacked Chart", 19: "Button", 20: "Text Label", 21: "Slider",
+    }
+
+    TAG_LABELS = {
+        "key": "Key (joins tables)", "numeric": "Numeric",
+        "integer": "Integer", "date": "Date", "text": "Text",
+        "ascii": "ASCII Text", "timestamp": "Timestamp",
+        "hidden": "Hidden", "system": "System",
+    }
+
+    INVENTORY = [
+        ("Visual Components",    "objects.csv",        "Charts, tables, filters and buttons found in the report"),
+        ("Data Fields",          "fields.csv",         "Columns and measures used across all data sources"),
+        ("Calculated Formulas",  "expressions.csv",    "Business logic expressions that were translated to DAX"),
+        ("Report Pages",         "sheets.csv",         "Individual pages/tabs within the original report"),
+        ("Filter Dimensions",    "dimensions.csv",     "Fields used as interactive filters for the user"),
+        ("Data Tables",          "m_query_output.csv",  "Source tables converted into Power Query (M) scripts"),
+    ]
+
+    all_metrics = []
+    all_fields = {}
+    all_tables = {}
+
+    for folder in report_folders:
+        if not folder.exists():
+            continue
+
+        qvw_name = folder.name
+        dfs = {}
+        counts = {}
+        descs = {}
+        for label, fname, desc in INVENTORY:
+            df = _load(folder, fname)
+            dfs[label] = df
+            counts[label] = len(df) if df is not None else 0
+            descs[label] = desc
+            all_metrics.append({"Report": qvw_name, "Category": label, "Count": counts[label]})
+
+        fdf = dfs.get("Data Fields")
+        if fdf is not None and "FieldName" in fdf.columns:
+            for fn in fdf["FieldName"].dropna().unique():
+                all_fields.setdefault(fn, set()).add(qvw_name)
+        tdf = dfs.get("Data Tables")
+        if tdf is not None and "TableName" in tdf.columns:
+            for tn in tdf["TableName"].dropna().unique():
+                all_tables.setdefault(tn, set()).add(qvw_name)
+
+        with st.expander(f"{qvw_name}", expanded=True):
+
+            st.caption(
+                "Overview of everything the pipeline extracted and translated from "
+                "the original QlikView report into Power BI-ready artefacts."
+            )
+
+            # --- Key metrics as big numbers ---
+            cols = st.columns(len(INVENTORY))
+            for i, (label, _, desc) in enumerate(INVENTORY):
+                cols[i].metric(label, counts[label], help=desc)
+
+            st.markdown("---")
+
+            # --- What was found: horizontal bar ---
+            inv_df = pd.DataFrame([
+                {"Category": k, "Count": v} for k, v in counts.items() if v > 0
+            ])
+            if not inv_df.empty:
+                st.altair_chart(
+                    _hbar(inv_df, "Count", "Category", "What the pipeline extracted"),
+                    use_container_width=True,
+                )
+
+            col_left, col_right = st.columns(2)
+
+            # --- Types of visual components ---
+            objects_df = dfs.get("Visual Components")
+            if objects_df is not None and "ObjectType" in objects_df.columns:
+                with col_left:
+                    type_col = pd.to_numeric(objects_df["ObjectType"], errors="coerce").dropna().astype(int)
+                    type_named = type_col.map(lambda v: OBJ_LABELS.get(v, "Other"))
+                    type_counts = type_named.value_counts().reset_index()
+                    type_counts.columns = ["Component", "Count"]
+                    st.altair_chart(
+                        _hbar(type_counts, "Count", "Component", "Types of visual components", color="#a855f7"),
+                        use_container_width=True,
+                    )
+
+            # --- Data field types ---
+            fields_df = dfs.get("Data Fields")
+            if fields_df is not None and "FieldTags" in fields_df.columns:
+                with col_right:
+                    tags = fields_df["FieldTags"].dropna()
+                    all_tags = []
+                    for t in tags:
+                        all_tags.extend([x.strip("$ ") for x in t.split(";") if x.strip()])
+                    if all_tags:
+                        tag_series = pd.Series(all_tags).map(lambda v: TAG_LABELS.get(v, "Other")).value_counts().reset_index()
+                        tag_series.columns = ["Field Type", "Count"]
+                        st.altair_chart(
+                            _hbar(tag_series, "Count", "Field Type", "Data field classification", color="#a855f7"),
+                            use_container_width=True,
+                        )
+
+            # --- Formulas per component ---
+            expr_df_raw = dfs.get("Calculated Formulas")
+            if expr_df_raw is not None and "ObjectId" in expr_df_raw.columns:
+                expr_counts = expr_df_raw["ObjectId"].value_counts().head(12).reset_index()
+                expr_counts.columns = ["Component", "Formulas"]
+                if objects_df is not None and "ObjectId" in objects_df.columns:
+                    caption_map = objects_df.set_index("ObjectId")["Caption"].to_dict()
+                    expr_counts["Component"] = expr_counts["Component"].map(
+                        lambda x: caption_map.get(x, x) if caption_map.get(x, "nan") != "nan" else x
+                    )
+                st.altair_chart(
+                    _hbar(expr_counts, "Formulas", "Component", "Formulas translated per component (top 12)"),
+                    use_container_width=True,
+                )
+
+    # --- Cross-report comparison ---
+    existing = [f for f in report_folders if f.exists()]
+    if len(existing) > 1:
+        st.markdown("---")
+        st.subheader("Comparison across reports")
+        st.caption("Side-by-side view of migration scope for each report processed by the pipeline.")
+        cmp_df = pd.DataFrame(all_metrics)
+        palette = ["#7c3aed", "#a855f7", "#c084fc", "#e9d5ff", "#6d28d9", "#8b5cf6"]
+        chart = alt.Chart(cmp_df).mark_bar(cornerRadiusEnd=4).encode(
+            x=alt.X("Count:Q", title=None),
+            y=alt.Y("Category:N", sort="-x", title=None),
+            color=alt.Color("Report:N", scale=alt.Scale(range=palette),
+                            legend=alt.Legend(title="Report", labelColor="#c4b5fd", titleColor="#c4b5fd")),
+            yOffset="Report:N",
+        ).properties(height=350).configure_view(strokeWidth=0).configure(
+            background="transparent",
+        ).configure_axis(
+            labelColor="#c4b5fd", titleColor="#c4b5fd", gridColor="#2a1065", labelFontSize=13,
+        )
+        st.altair_chart(chart, use_container_width=True)
+
+    # --- Combined Data Landscape ---
+    if all_tables or all_fields:
+        st.markdown("---")
+        st.subheader("Combined Data Landscape")
+        st.caption(
+            "All data tables and fields found across every report, "
+            "showing which ones are shared between reports."
+        )
+        n_reports = len([f for f in report_folders if f.exists()])
+
+        tab_tables, tab_fields = st.tabs(["Data Tables", "Data Fields"])
+
+        with tab_tables:
+            if all_tables:
+                t_rows = []
+                for name, reports in sorted(all_tables.items()):
+                    t_rows.append({
+                        "Table": name,
+                        "Appears in": len(reports),
+                        "Reports": ", ".join(sorted(reports)),
+                        "Shared": "Yes" if len(reports) > 1 else "No",
+                    })
+                t_df = pd.DataFrame(t_rows)
+                shared_t = t_df[t_df["Shared"] == "Yes"]
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Total tables", len(t_df))
+                c2.metric("Shared across reports", len(shared_t))
+                c3.metric("Unique to one report", len(t_df) - len(shared_t))
+                st.dataframe(
+                    t_df.sort_values("Appears in", ascending=False),
+                    use_container_width=True, hide_index=True,
+                )
+            else:
+                st.info("No table data available.")
+
+        with tab_fields:
+            if all_fields:
+                f_rows = []
+                for name, reports in sorted(all_fields.items()):
+                    f_rows.append({
+                        "Field": name,
+                        "Appears in": len(reports),
+                        "Reports": ", ".join(sorted(reports)),
+                        "Shared": "Yes" if len(reports) > 1 else "No",
+                    })
+                f_df = pd.DataFrame(f_rows)
+                shared_f = f_df[f_df["Shared"] == "Yes"]
+                c1, c2, c3 = st.columns(3)
+                c1.metric("Total fields", len(f_df))
+                c2.metric("Shared across reports", len(shared_f))
+                c3.metric("Unique to one report", len(f_df) - len(shared_f))
+                if n_reports > 1 and not shared_f.empty:
+                    st.altair_chart(
+                        _hbar(
+                            shared_f.sort_values("Appears in", ascending=False).head(20),
+                            "Appears in", "Field",
+                            "Most shared fields across reports",
+                            color="#a855f7",
+                        ),
+                        use_container_width=True,
+                    )
+                st.dataframe(
+                    f_df.sort_values("Appears in", ascending=False),
+                    use_container_width=True, hide_index=True,
+                )
+            else:
+                st.info("No field data available.")
+
+    # --- Pipeline Execution Summary ---
+    log = load_execution_log(settings)
+    if log:
+        st.markdown("---")
+        st.subheader("Pipeline Execution Summary")
+        rows = []
+        for step_key, step_data in log.items():
+            rows.append({
+                "Step": step_key,
+                "Status": step_data.get("status", "unknown"),
+                "Duration (s)": round(step_data.get("duration_sec", 0), 1),
+                "Last Run": step_data.get("last_run", "N/A"),
+            })
+        st.dataframe(pd.DataFrame(rows), use_container_width=True)
 
 def display_executions():
-    st.set_page_config(layout="wide")
     st.title("Executions Summary")
     log = load_execution_log(settings)
 
@@ -1350,6 +1557,298 @@ def render_upload_qvw_page():
 # def display_migration_comparison():     # Step 8 disabled
 # (All comparison/validation display functions commented out — re-enable when Step 8 is ready)
 
+def display_complexity_analysis():
+    st.title("Migration Complexity Analysis")
+    st.caption(
+        "Quantitative complexity scoring based on feature extraction across four dimensions: "
+        "Data Model, Expressions, Script structure, and Layout density. "
+        "Features are normalised using predefined reference ranges and combined via weighted scoring."
+    )
+
+    output_root = Path(settings.get("output_qv_restructured_folder_path", ""))
+    if not output_root.exists():
+        st.error("Output path not found.")
+        return
+
+    if CLOUD_MODE:
+        report_folders = sorted([
+            d for d in output_root.iterdir()
+            if d.is_dir() and (d / "fields.csv").exists()
+        ])
+    else:
+        input_folder = Path(settings.get("root_folder_path", ""))
+        if not input_folder.exists():
+            st.error("Input root path is invalid.")
+            return
+        qvw_files = sorted(input_folder.glob("*.qvw"))
+        report_folders = [output_root / qvw_file.stem for qvw_file in qvw_files]
+
+    if not report_folders:
+        st.warning("No report data found. Run the pipeline first.")
+        return
+
+    for folder in report_folders:
+        if not folder.exists():
+            continue
+
+        qvw_name = folder.name
+        with st.expander(f"Analysis: {qvw_name}", expanded=True):
+            result = compute_complexity(folder)
+
+            if result is None:
+                st.warning(f"Insufficient data for complexity analysis in {qvw_name}.")
+                continue
+
+            score = result["overall_score"]
+            classification = result["classification"]
+            effort_min, effort_max = result["effort_days"]
+
+            badge_colors = {
+                "Low": "#22c55e", "Medium": "#eab308",
+                "High": "#f97316", "Critical": "#ef4444",
+            }
+            badge_color = badge_colors.get(classification, "#8b5cf6")
+            st.markdown(
+                f'<div style="display:inline-block;padding:6px 18px;border-radius:8px;'
+                f'background:{badge_color};color:#fff;font-weight:700;font-size:18px;'
+                f'margin-bottom:12px;">{classification} Complexity</div>',
+                unsafe_allow_html=True,
+            )
+
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Overall Score", f"{score:.1f} / 100")
+            col2.metric("Classification", classification)
+            col3.metric("Estimated Effort", f"{effort_min}–{effort_max} person-days")
+
+            st.markdown("---")
+
+            st.subheader("Dimension Scores")
+            dim_cols = st.columns(4)
+            cat_labels = ["Data Model", "Expressions", "Script", "Layout"]
+            cat_weights = ["(30%)", "(25%)", "(25%)", "(20%)"]
+            for i, label in enumerate(cat_labels):
+                dim_cols[i].metric(
+                    f"{label} {cat_weights[i]}",
+                    f"{result['category_scores'][label]:.1f}",
+                )
+
+            st.subheader("Dimension Score Distribution")
+            chart_df = pd.DataFrame({
+                "Dimension": list(result["category_scores"].keys()),
+                "Score": list(result["category_scores"].values()),
+            }).set_index("Dimension")
+            st.bar_chart(chart_df)
+
+            st.subheader("Feature Breakdown")
+            tab_dm, tab_expr, tab_scr, tab_lay = st.tabs(
+                ["Data Model", "Expressions", "Script", "Layout"]
+            )
+
+            categories = [
+                (tab_dm, "data_model", "Data Model"),
+                (tab_expr, "expressions", "Expressions"),
+                (tab_scr, "script", "Script"),
+                (tab_lay, "layout", "Layout"),
+            ]
+            for tab, key, label in categories:
+                with tab:
+                    raw = result["raw_features"].get(key, {})
+                    norm = result["normalized_features"].get(key, {})
+                    rows = []
+                    for feat_name in raw:
+                        rows.append({
+                            "Feature": feat_name.replace("_", " ").title(),
+                            "Raw Value": raw[feat_name],
+                            "Normalised (0-1)": round(norm.get(feat_name, 0), 3),
+                        })
+                    if rows:
+                        st.dataframe(pd.DataFrame(rows), use_container_width=True)
+
+                    if norm:
+                        norm_df = pd.DataFrame({
+                            "Feature": [k.replace("_", " ").title() for k in norm],
+                            "Normalised Score": list(norm.values()),
+                        }).set_index("Feature")
+                        st.bar_chart(norm_df)
+
+            st.subheader("Migration Recommendations")
+            for rec in result["recommendations"]:
+                st.markdown(f"- {rec}")
+
+            with st.expander("Methodology", expanded=False):
+                st.markdown(
+                    "**Feature Engineering:** 27 features extracted from 7 data sources "
+                    "across four analytical dimensions.\n\n"
+                    "**Normalisation:** Min-max scaling with predefined reference ranges "
+                    "(not data-dependent) to enable single-report scoring.\n\n"
+                    "**Scoring:** Two-level weighted aggregation — features within each dimension "
+                    "are combined using intra-category weights, then dimensions are combined "
+                    "using inter-category weights (Data Model 30%, Expressions 25%, Script 25%, Layout 20%).\n\n"
+                    "**Classification:** Score ranges — Low (0-25), Medium (25-50), High (50-75), Critical (75-100).\n\n"
+                    "**Effort Estimation:** Based on industry benchmarks for QlikView-to-Power BI migration "
+                    "projects, calibrated per complexity tier."
+                )
+
+def display_translation_quality():
+    st.title("Translation Quality Evaluation")
+    st.caption(
+        "Quantitative evaluation of LLM-generated DAX and M Query translations "
+        "against human-validated gold-standard references using BLEU, token-level "
+        "precision/recall/F1, normalised edit similarity, and structural analysis."
+    )
+
+    output_root = Path(settings.get("output_qv_restructured_folder_path", ""))
+    if not output_root.exists():
+        st.error("Output path not found.")
+        return
+
+    if CLOUD_MODE:
+        report_folders = sorted([
+            d for d in output_root.iterdir()
+            if d.is_dir() and (d / "expressions_with_dax.csv").exists()
+        ])
+    else:
+        input_folder = Path(settings.get("root_folder_path", ""))
+        if not input_folder.exists():
+            st.error("Input root path is invalid.")
+            return
+        qvw_files = sorted(input_folder.glob("*.qvw"))
+        report_folders = [output_root / qvw_file.stem for qvw_file in qvw_files]
+
+    if not report_folders:
+        st.warning("No report data found. Run the pipeline first (Steps 4-5).")
+        return
+
+    for folder in report_folders:
+        if not folder.exists():
+            continue
+
+        result = run_evaluation(folder, _PROJECT_ROOT)
+        if result is None:
+            st.warning(f"No gold standard available for {folder.name}.")
+            continue
+
+        qvw_name = result["report_name"]
+        s = result["summary"]
+
+        with st.expander(f"Evaluation: {qvw_name}", expanded=True):
+
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("BLEU Score", f"{s['bleu']['mean']:.3f}")
+            col2.metric("Token F1", f"{s['token_f1']['mean']:.3f}")
+            col3.metric("Edit Similarity", f"{s['edit_similarity']['mean']:.3f}")
+            col4.metric("Structural Match", f"{s['structural_similarity']['mean']:.3f}")
+
+            st.markdown("---")
+
+            mcol1, mcol2, mcol3 = st.columns(3)
+            mcol1.metric("Total Evaluated", s["total_translations"])
+            mcol2.metric("Exact Matches", f"{s['exact_matches']} ({s['exact_match_rate']*100:.0f}%)")
+            mcol3.metric("DAX / M Query", f"{s['dax_count']} / {s['m_query_count']}")
+
+            st.subheader("Quality Distribution")
+            dist = s["quality_distribution"]
+            dist_df = pd.DataFrame({
+                "Quality Tier": list(dist.keys()),
+                "Count": list(dist.values()),
+            }).set_index("Quality Tier")
+            st.bar_chart(dist_df)
+
+            st.subheader("Metric Summary (mean +/- std)")
+            stats_df = pd.DataFrame({
+                "Metric": ["BLEU-4", "Token F1", "Edit Similarity", "Structural Similarity"],
+                "Mean": [
+                    s["bleu"]["mean"], s["token_f1"]["mean"],
+                    s["edit_similarity"]["mean"], s["structural_similarity"]["mean"],
+                ],
+                "Std": [
+                    s["bleu"]["std"], s["token_f1"]["std"],
+                    s["edit_similarity"]["std"], s["structural_similarity"]["std"],
+                ],
+                "Min": [
+                    s["bleu"]["min"], s["token_f1"]["min"],
+                    s["edit_similarity"]["min"], s["structural_similarity"]["min"],
+                ],
+                "Max": [
+                    s["bleu"]["max"], s["token_f1"]["max"],
+                    s["edit_similarity"]["max"], s["structural_similarity"]["max"],
+                ],
+            })
+            st.dataframe(stats_df, use_container_width=True)
+
+            st.subheader("Per-Translation Results")
+            tab_dax, tab_mq = st.tabs(["DAX Expressions", "M Query Tables"])
+
+            with tab_dax:
+                for r in result["dax_results"]:
+                    m = r["metrics"]
+                    badge_html = (
+                        f'<span style="padding:3px 10px;border-radius:6px;'
+                        f'background:{r["quality_color"]};color:#fff;'
+                        f'font-weight:700;font-size:13px;">{r["quality"]}</span>'
+                    )
+                    with st.expander(f'{r["id"]} — {r["object_id"]} | BLEU {m["bleu"]["bleu"]:.3f}'):
+                        st.markdown(badge_html, unsafe_allow_html=True)
+                        st.markdown(f"**QlikView:** `{r['qlikview_expression']}`")
+                        st.code(f"Reference:  {r['reference']}\nGenerated:  {r['generated']}", language="dax")
+                        dcol1, dcol2, dcol3, dcol4 = st.columns(4)
+                        dcol1.metric("BLEU-4", f"{m['bleu']['bleu']:.3f}")
+                        dcol2.metric("Token F1", f"{m['token_metrics']['f1']:.3f}")
+                        dcol3.metric("Edit Sim", f"{m['edit_similarity']:.3f}")
+                        dcol4.metric("Struct Sim", f"{m['structural']['structural_similarity']:.3f}")
+                        if "name_match" in m["structural"]:
+                            scol1, scol2, scol3 = st.columns(3)
+                            scol1.metric("Name Match", f"{m['structural']['name_match']:.0f}")
+                            scol2.metric("Function Match", f"{m['structural']['function_match']:.2f}")
+                            scol3.metric("Reference Match", f"{m['structural']['reference_match']:.2f}")
+
+            with tab_mq:
+                for r in result["m_query_results"]:
+                    m = r["metrics"]
+                    badge_html = (
+                        f'<span style="padding:3px 10px;border-radius:6px;'
+                        f'background:{r["quality_color"]};color:#fff;'
+                        f'font-weight:700;font-size:13px;">{r["quality"]}</span>'
+                    )
+                    with st.expander(f'{r["id"]} — {r["table_name"]} | BLEU {m["bleu"]["bleu"]:.3f}'):
+                        st.markdown(badge_html, unsafe_allow_html=True)
+                        st.code(r["reference"], language="powerquery")
+                        st.markdown("**Generated:**")
+                        st.code(r["generated"], language="powerquery")
+                        dcol1, dcol2, dcol3, dcol4 = st.columns(4)
+                        dcol1.metric("BLEU-4", f"{m['bleu']['bleu']:.3f}")
+                        dcol2.metric("Token F1", f"{m['token_metrics']['f1']:.3f}")
+                        dcol3.metric("Edit Sim", f"{m['edit_similarity']:.3f}")
+                        dcol4.metric("Struct Sim", f"{m['structural']['structural_similarity']:.3f}")
+                        if "source_match" in m["structural"]:
+                            scol1, scol2, scol3 = st.columns(3)
+                            scol1.metric("Source Match", f"{m['structural']['source_match']:.2f}")
+                            scol2.metric("Operation Match", f"{m['structural']['operation_match']:.2f}")
+                            scol3.metric("Column Match", f"{m['structural']['column_match']:.2f}")
+
+            with st.expander("Methodology", expanded=False):
+                st.markdown(
+                    "**BLEU-4:** Measures n-gram overlap (1-gram through 4-gram) between "
+                    "reference and generated code, with brevity penalty for shorter outputs. "
+                    "Standard machine translation metric adapted for code (Papineni et al., 2002).\n\n"
+                    "**Token F1:** Precision, recall, and F1 computed on the multi-set of code tokens. "
+                    "Captures whether the correct identifiers, functions, and operators are present.\n\n"
+                    "**Edit Similarity:** 1 minus the normalised Levenshtein distance on tokenised code. "
+                    "Measures character-level similarity after tokenisation.\n\n"
+                    "**Structural Similarity:** Domain-specific analysis:\n"
+                    "- *DAX:* Decomposes into measure name, DAX functions, and table[column] references. "
+                    "Weighted combination (name 20%, functions 40%, references 40%).\n"
+                    "- *M Query:* Decomposes into data sources, table operations, and column definitions. "
+                    "Weighted Jaccard similarity (sources 30%, operations 30%, columns 40%).\n\n"
+                    "**Quality Classification:** Composite score = 0.3*BLEU + 0.3*F1 + 0.4*Structural. "
+                    "Thresholds: Exact Match (identical after normalisation), "
+                    "High Quality (>= 0.85), Acceptable (>= 0.65), Needs Review (>= 0.40), Poor (< 0.40).\n\n"
+                    "**Gold Standard:** 16 translations (8 DAX + 8 M Query) manually validated "
+                    "by a Power BI expert. DAX references verified against fields.csv metadata. "
+                    "M Query scripts validated for structural equivalence to QlikView LOAD statements."
+                )
+
+
 # Router logic
 if selected == "Main App":
     display_main_app()
@@ -1357,11 +1856,13 @@ elif selected == "Pipeline Info":
     display_pipeline_info()
 elif selected == "DAX, M Query, Pages":
     display_results()
-elif selected == "Power BI":
+elif selected == "Summary Report":
     display_report()
+elif selected == "Complexity Analysis":
+    display_complexity_analysis()
+elif selected == "Translation Quality":
+    display_translation_quality()
 elif selected == "Execution History":
     display_executions()
 elif selected == "Logs":
     display_log_viewer()
-# elif selected == "Validation":  # Step 8 disabled
-#     display_migration_comparison()

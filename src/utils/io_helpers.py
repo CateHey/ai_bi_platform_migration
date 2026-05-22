@@ -176,10 +176,7 @@ def copy_output_to_restructured_by_source_structure(root_folder: Path, metadata_
             raise FileNotFoundError(msg)
 
         destination_folder.parent.mkdir(parents=True, exist_ok=True)
-        if destination_folder.exists():
-            logger.warning(f"Subfolder already exists, skipping: {destination_folder}")
-            return
-        shutil.copytree(source_output_folder, destination_folder)
+        shutil.copytree(source_output_folder, destination_folder, dirs_exist_ok=True)
         logger.info(f"Copied {source_output_folder} to {destination_folder}")
     except Exception:
             raise

@@ -1,0 +1,594 @@
+Class	Type	SubType	Id	Bytes	Count	Size	CalcTime	AvgCalcTime
+Variable	Variable	Internal	CD				
+Variable	Variable	Internal	QvPath				
+Variable	Variable	Internal	QvRoot				
+Variable	Variable	Internal	QvWorkPath				
+Variable	Variable	Internal	QvWorkRoot				
+Variable	Variable	Internal	WinPath				
+Variable	Variable	Internal	WinRoot				
+Variable	Variable	Internal	ErrorMode				
+Variable	Variable	Internal	StripComments				
+Variable	Variable	Internal	OpenUrlTimeout				
+Variable	Variable	Internal	ScriptErrorCount				
+Variable	Variable	Internal	ScriptErrorList				
+Variable	Variable	Internal	ScriptError				
+Variable	Variable	Internal	ThousandSep				
+Variable	Variable	Internal	DecimalSep				
+Variable	Variable	Internal	MoneyThousandSep				
+Variable	Variable	Internal	MoneyDecimalSep				
+Variable	Variable	Internal	MoneyFormat				
+Variable	Variable	Internal	TimeFormat				
+Variable	Variable	Internal	DateFormat				
+Variable	Variable	Internal	TimestampFormat				
+Variable	Variable	Internal	MonthNames				
+Variable	Variable	Internal	DayNames				
+Variable	Variable	Internal	eLoadFactor			0	0.0
+Variable	Variable	Internal	ePerformedVsScheduled			0	0.0
+Variable	Variable	Internal	eAirTime			0	0.0
+Variable	Variable	Internal	eEnplanedPassengers			0	0.0
+Variable	Variable	Internal	eDeparturesPerformed			0	0.0
+Variable	Variable	Internal	eRevenuePassengerMiles				
+Variable	Variable	Internal	eAvailableSeatMiles				
+Variable	Variable	Internal	eAvailableSeats			0	0.0
+Variable	Variable	Internal	FLOPPY				
+Variable	Variable	Internal	vLoadMainData				
+Variable	Variable	Internal	HidePrefix				
+Variable	Variable	Internal	vFolderSourceData				
+Variable	Variable	Internal	FLOPPY2				
+Variable	Variable	Internal	vTop			0	0.0
+Variable	Variable	Internal	vTotalFTEs			0	0.0
+Variable	Variable	Internal	eFTEs			0	0.0
+Variable	Variable	Internal	eDeparturesPerformed_VarUnit			0	0.0
+Variable	Variable	Internal	vSetYTD			0	0.0
+Variable	Variable	Internal	vSetQTD				
+Variable	Variable	Internal	vSetMTD			0	0.0
+Variable	Variable	Internal	vSetPreviousMonth			0	0.0
+Variable	Variable	Internal	vSetPreviousQuarter				
+Variable	Variable	Internal	vSetLYMTD			0	0.0
+Variable	Variable	Internal	vSetLYQTD				
+Variable	Variable	Internal	vSetLYYTD			0	0.0
+Variable	Variable	Internal	vSetRolling12				
+Variable	Variable	Internal	vSetPreviousNMonth			0	0.0
+Variable	Variable	Internal	FLOPPY3				
+Sheetobject	Graph	Internal	Document\CH15	8864			16	16.0
+Sheetobject	TextObject	Internal	Document\TX04	544			0	0.0
+Sheetobject	TextObject	Internal	Document\TX03	544			0	0.0
+Sheetobject	TextObject	Internal	Document\TX02	544			0	0.0
+Sheetobject	TextObject	Internal	Document\TX01	544			0	0.0
+Sheetobject	ListBox	Internal	Document\LB33	544				
+Sheetobject	Graph	Internal	Document\CH54	5728			0	7.5
+Sheetobject	ListBox	Internal	Document\LB29	544				
+Sheetobject	ListBox	Internal	Document\LB27	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	Graph	Internal	Document\CH06	4768			0	0.0
+Sheetobject	Graph	Internal	Document\CH07	4704			0	7.5
+Sheetobject	MultiBox	Internal	Document\MB02	544			0	0.0
+Sheetobject	ListBox	Internal	Document\LB28	544				
+Sheetobject	Graph	Internal	Document\CH05	4704			0	0.0
+Sheetobject	MultiBox	Internal	Document\MB01	544			0	0.0
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	TextObject	Internal	Document\TX05	544			0	0.0
+Sheetobject	ListBox	Internal	Document\LB29	544				
+Sheetobject	ListBox	Internal	Document\LB27	544				
+Sheetobject	ListBox	Internal	Document\LB33	544				
+Sheetobject	ListBox	Internal	Document\LB28	544				
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	MultiBox	Internal	Document\MB01	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	Graph	Internal	Document\CH04	42336			0	0.0
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	StatisticsBox	Internal	Document\SB01	544			0	0.0
+Sheetobject	MultiBox	Internal	Document\MB02	544				
+Sheetobject	PivotTableBox	Internal	Document\CH51	392616			16	16.0
+Sheetobject	Graph	Internal	Document\CH01	5728			0	0.0
+Sheetobject	StraightTableBox	Internal	Document\CH02	3136224			63	63.0
+Sheetobject	Graph	Internal	Document\CH03	7904			15	15.0
+Sheetobject	ListBox	Internal	Document\LB33	544				
+Sheetobject	PivotTableBox	Internal	Document\CH22	544			16	16.0
+Sheetobject	StraightTableBox	Internal	Document\CH21	42272			15	15.0
+Sheetobject	MultiBox	Internal	Document\MB02	544				
+Sheetobject	ListBox	Internal	Document\LB28	544				
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	MultiBox	Internal	Document\MB01	544				
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	ListBox	Internal	Document\LB27	544				
+Sheetobject	ListBox	Internal	Document\LB29	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	ListBox	Internal	Document\LB04	544				
+Sheetobject	ListBox	Internal	Document\LB01	544				
+Sheetobject	ListBox	Internal	Document\LB13	544				
+Sheetobject	ListBox	Internal	Document\LB07	544				
+Sheetobject	ListBox	Internal	Document\LB02	544				
+Sheetobject	ListBox	Internal	Document\LB06	544				
+Sheetobject	ListBox	Internal	Document\LB05	544				
+Sheetobject	ListBox	Internal	Document\LB03	544				
+Sheetobject	ListBox	Internal	Document\LB15	544				
+Sheetobject	ListBox	Internal	Document\LB10	544				
+Sheetobject	ListBox	Internal	Document\LB12	544				
+Sheetobject	ListBox	Internal	Document\LB11	544				
+Sheetobject	ListBox	Internal	Document\LB09	544				
+Sheetobject	Graph	Internal	Document\CH14	4704			0	0.0
+Sheetobject	Graph	Internal	Document\CH12	4704			0	0.0
+Sheetobject	Graph	Internal	Document\CH13	4704			0	0.0
+Sheetobject	Graph	Internal	Document\CH09	4704			0	0.0
+Sheetobject	Graph	Internal	Document\CH11	4704			0	0.0
+Sheetobject	Graph	Internal	Document\CH08	4704			0	0.0
+Sheetobject	MultiBox	Internal	Document\MB02	544				
+Sheetobject	Graph	Internal	Document\CH41	8608			0	0.0
+Sheetobject	Graph	Internal	Document\CH28	129312			15	15.0
+Sheetobject	Graph	Internal	Document\CH26	6752			0	0.0
+Sheetobject	Graph	Internal	Document\CH27	5216			16	16.0
+Sheetobject	Graph	Internal	Document\CH24	5856			0	0.0
+Sheetobject	Graph	Internal	Document\CH25	5984			16	16.0
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	MultiBox	Internal	Document\MB01	544				
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	ListBox	Internal	Document\LB28	544				
+Sheetobject	ListBox	Internal	Document\LB33	544				
+Sheetobject	ListBox	Internal	Document\LB27	544				
+Sheetobject	ListBox	Internal	Document\LB29	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	ListBox	Internal	Document\LB29	544				
+Sheetobject	ListBox	Internal	Document\LB27	544				
+Sheetobject	ListBox	Internal	Document\LB33	544				
+Sheetobject	ListBox	Internal	Document\LB28	544				
+Sheetobject	MultiBox	Internal	Document\MB01	544				
+Sheetobject	StraightTableBox	Internal	Document\CH38	12832			16	16.0
+Sheetobject	MultiBox	Internal	Document\MB02	544				
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	TableBox	Internal	Document\TB01	16254112			94	94.0
+Sheetobject	ListBox	Internal	Document\LB34	544				
+Sheetobject	ListBox	Internal	Document\LB35	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	InputBox	Internal	Document\IB01	544				
+Sheetobject	StraightTableBox	Internal	Document\CH45	8288			16	16.0
+Sheetobject	Graph	Internal	Document\CH42	7648			0	0.0
+Sheetobject	StraightTableBox	Internal	Document\CH43	18528			0	0.0
+Sheetobject	StraightTableBox	Internal	Document\CH44	17440			0	0.0
+Sheetobject	ListBox	Internal	Document\LB36	544				
+Sheetobject	Graph	Internal	Document\CH46	5856			0	0.0
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	TextObject	Internal	Document\TX06	544			0	0.0
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	StraightTableBox	Internal	Document\CH49	35744			109	109.0
+Sheetobject	StraightTableBox	Internal	Document\CH48	8480			0	0.0
+Sheetobject	PivotTableBox	Internal	Document\CH47	55784			47	47.0
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	PivotTableBox	Internal	Document\CH56	13160			453	453.0
+Sheetobject	PivotTableBox	Internal	Document\CH50	392616			0	0.0
+Sheetobject	StraightTableBox	Internal	Document\CH52	5792			0	0.0
+Sheetobject	PivotTableBox	Internal	Document\CH55	15848			15	15.0
+Sheetobject	Graph	Internal	Document\CH53	5728			15	15.0
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	PivotTableBox	Internal	Document\CH58	6824			16	16.0
+Sheetobject	StraightTableBox	Internal	Document\CH59	5280			31	31.0
+Sheetobject	PivotTableBox	Internal	Document\CH57	12840			31	31.0
+Sheetobject	StraightTableBox	Internal	Document\CH65	47072			15	15.0
+Sheetobject	Graph	Internal	Document\CH62	4704			0	0.0
+Sheetobject	Graph	Internal	Document\CH61	4704			0	0.0
+Sheetobject	Graph	Internal	Document\CH60	4704			0	0.0
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	MultiBox	Internal	Document\MB01	544				
+Sheetobject	MultiBox	Internal	Document\MB02	544				
+Sheetobject	ListBox	Internal	Document\LB33	544				
+Sheetobject	ListBox	Internal	Document\LB28	544				
+Sheetobject	ListBox	Internal	Document\LB27	544				
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	ListBox	Internal	Document\LB29	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	CurrentSelection	Internal	Document\CS02	544				
+Sheetobject	CurrentSelection	Internal	Document\CS03	544				
+Sheetobject	Graph	Internal	Document\CH66	7072			0	0.0
+Sheetobject	StraightTableBox	Internal	Document\CH67	7072			0	0.0
+Sheetobject	ListBox	Internal	Document\LB39	544				
+Sheetobject	ListBox	Internal	Document\LB43	544				
+Sheetobject	ListBox	Internal	Document\LB44	544				
+Sheetobject	ListBox	Internal	Document\LB45	544				
+Sheetobject	ListBox	Internal	Document\LB38	544				
+Sheetobject	ListBox	Internal	Document\LB40	544				
+Sheetobject	ListBox	Internal	Document\LB41	544				
+Sheetobject	ListBox	Internal	Document\LB42	544				
+Sheetobject	ListBox	Internal	Document\LB37	544				
+Sheetobject	ListBox	Internal	Document\LB39	544				
+Sheetobject	ListBox	Internal	Document\LB43	544				
+Sheetobject	ListBox	Internal	Document\LB44	544				
+Sheetobject	ListBox	Internal	Document\LB45	544				
+Sheetobject	ListBox	Internal	Document\LB38	544				
+Sheetobject	ListBox	Internal	Document\LB40	544				
+Sheetobject	ListBox	Internal	Document\LB41	544				
+Sheetobject	ListBox	Internal	Document\LB42	544				
+Sheetobject	ListBox	Internal	Document\LB37	544				
+Sheetobject	ListBox	Internal	Document\LB31	544				
+Sheetobject	Button	Internal	Document\BU01	544				
+Sheetobject	CurrentSelection	Internal	Document\CS01	544				
+Sheetobject	Button	Internal	Document\BU03	544				
+Sheetobject	Button	Internal	Document\BU02	544				
+Sheetobject	ListBox	Internal	Document\LB30	544				
+Sheetobject	ListBox	Internal	Document\LB32	544				
+Sheetobject	Graph	Internal	Document\CH68	8992			16	16.0
+Sheetobject	ListBox	Internal	Document\LB29	544				
+Sheetobject	ListBox	Internal	Document\LB33	544				
+Sheetobject	StraightTableBox	Internal	Document\CH70	7648			0	0.0
+Sheetobject	Graph	Internal	Document\CH69	18080			0	0.0
+Database	Table	Records	Main Data	105736442	1258763	84
+Database	Table	Records	Master Calendar	4305	1065	4
+Database	Table	Records	Carrier Groups	22	8	1
+Database	Table	Records	Airlines	1024	337	3
+Database	Table	Internal	Airlines	384
+Database	Table	Records	Carrier Operating Region	22	8	1
+Database	Table	Records	Flight Types	18	4	1
+Database	Table	Records	Aircraft Types	1302	180	7
+Database	Table	Records	Distance Groups	44	22	2
+Database	Table	Records	Origin Airports	6384	2124	3
+Database	Table	Records	Destination Airports	6568	2185	3
+Database	Table	Records	Origin Markets	5592	1860	3
+Database	Table	Records	Destination Markets	5766	1918	3
+Database	Table	Records	INLFED	17	3	1
+Database	Table	Records	$$SysTable 13	318	106	3
+Database	Table	Records	$$SysTable 14	41	13	2
+Database	Table	Records	$$SysTable 15	95	95	1
+Database	Field	Symbols	$Field	2347	95	24.71
+Database	Field	Symbols	$Table	263	13	20.23
+Database	Field	Symbols	$Rows	158	12	13.17
+Database	Field	Symbols	$Fields	46	4	11.50
+Database	Field	Symbols	$FieldNo	807	68	11.87
+Database	Field	Symbols	$Info	6	1	6.00
+Database	Field	Symbols	%Airline ID	5061	338	14.97
+Database	Field	Symbols	%Carrier Group ID	83	8	10.38
+Database	Field	Symbols	%Unique Carrier Code	2798	338	8.28
+Database	Field	Symbols	%Unique Carrier Entity Code	5631	408	13.80
+Database	Field	Symbols	%Region Code	48	7	6.86
+Database	Field	Symbols	%Origin Airport ID	31860	2124	15.00
+Database	Field	Symbols	%Origin Airport Sequence ID	56780	3340	17.00
+Database	Field	Symbols	%Origin Airport Market ID	27885	1859	15.00
+Database	Field	Symbols	%Origin World Area Code	2697	212	12.72
+Database	Field	Symbols	%Destination Airport ID	32775	2185	15.00
+Database	Field	Symbols	%Destination Airport Sequence ID	58395	3435	17.00
+Database	Field	Symbols	%Destination Airport Market ID	28755	1917	15.00
+Database	Field	Symbols	%Destination World Area Code	2659	209	12.72
+Database	Field	Symbols	%Aircraft Group ID	99	9	11.00
+Database	Field	Symbols	%Aircraft Type ID	2340	180	13.00
+Database	Field	Symbols	%Aircraft Configuration ID	44	4	11.00
+Database	Field	Symbols	%Distance Group ID	255	22	11.59
+Database	Field	Symbols	%Service Class ID	28	4	7.00
+Database	Field	Symbols	%Datasource ID	32	4	8.00
+Database	Field	Symbols	# Departures Scheduled	11464	722	15.88
+Database	Field	Symbols	# Departures Performed	11463	723	15.85
+Database	Field	Symbols	# Payload	4614530	238153	19.38
+Database	Field	Symbols	Distance	84317	5025	16.78
+Database	Field	Symbols	# Available Seats	404531	23065	17.54
+Database	Field	Symbols	# Transported Passengers	462254	26298	17.58
+Database	Field	Symbols	# Transported Freight	3482786	185470	18.78
+Database	Field	Symbols	# Transported Mail	886770	49457	17.93
+Database	Field	Symbols	# Ramp-To-Ramp Time	586296	33188	17.67
+Database	Field	Symbols	# Air Time	533481	30255	17.63
+Database	Field	Symbols	Unique Carrier	9548	343	27.84
+Database	Field	Symbols	Carrier Code	2830	342	8.27
+Database	Field	Symbols	Carrier Name	9667	349	27.70
+Database	Field	Symbols	Origin Airport Code	19134	2126	9.00
+Database	Field	Symbols	Origin City	40354	1919	21.03
+Database	Field	Symbols	Origin State Code	542	68	7.97
+Database	Field	Symbols	Origin State FIPS	654	55	11.89
+Database	Field	Symbols	Origin State	1104	68	16.24
+Database	Field	Symbols	Origin Country Code	1168	146	8.00
+Database	Field	Symbols	Origin Country	2223	146	15.23
+Database	Field	Symbols	Destination Airport Code	19692	2188	9.00
+Database	Field	Symbols	Destination City	41713	1982	21.05
+Database	Field	Symbols	Destination State Code	534	67	7.97
+Database	Field	Symbols	Destination State FIPS	642	54	11.89
+Database	Field	Symbols	Destination State	1078	67	16.09
+Database	Field	Symbols	Destination Country Code	1152	144	8.00
+Database	Field	Symbols	Destination Country	2186	144	15.18
+Database	Field	Symbols	Period	576	36	16.00
+Database	Field	Symbols	From - To Airport Code	768180	51212	15.00
+Database	Field	Symbols	From - To Airport ID	972971	51209	19.00
+Database	Field	Symbols	From - To City	1728183	46665	37.03
+Database	Field	Symbols	From - To State Code	39145	3027	12.93
+Database	Field	Symbols	From - To State	80597	3027	26.63
+Database	Field	Symbols	# M-Delta Total Employees	3728	414	9.00
+Database	Field	Symbols	# M-Delta Full Time Employees	3359	373	9.01
+Database	Field	Symbols	# M-Delta Part Time Employees	2234	248	9.01
+Database	Field	Symbols	# M-Delta Equivalent FTEs	3557	395	9.01
+Database	Field	Symbols	# Q-Delta Total Employees	5294	588	9.00
+Database	Field	Symbols	# Q-Delta Full Time Employees	4979	553	9.00
+Database	Field	Symbols	# Q-Delta Part Time Employees	3170	352	9.01
+Database	Field	Symbols	# Q-Delta Equivalent FTEs	5105	567	9.00
+Database	Field	Symbols	# Y-Delta Total Employees	6743	749	9.00
+Database	Field	Symbols	# Y-Delta Full Time Employees	6536	726	9.00
+Database	Field	Symbols	# Y-Delta Part Time Employees	3818	424	9.00
+Database	Field	Symbols	# Y-Delta Equivalent FTEs	6761	751	9.00
+Database	Field	Symbols	# Total Employees	24046	1741	13.81
+Database	Field	Symbols	# Full Time Employees	23501	1709	13.75
+Database	Field	Symbols	# Part Time Employees	11961	891	13.42
+Database	Field	Symbols	# Equivalent FTEs	23871	1730	13.80
+Database	Field	Symbols	Year	0	3	0.00
+Database	Field	Symbols	Month	156	12	13.00
+Database	Field	Symbols	Year - Month	288	36	8.00
+Database	Field	Symbols	Quarter	32	4	8.00
+Database	Field	Symbols	QuarterID	0	12	0.00
+Database	Field	Symbols	PeriodID	0	36	0.00
+Database	Field	Symbols	Carrier Group	838	8	104.75
+Database	Field	Symbols	Airline	10825	337	32.12
+Database	Field	Symbols	Carrier's Operating Region	104	7	14.86
+Database	Field	Symbols	Flight Type	138	4	34.50
+Database	Field	Symbols	Aircraft Name	3535	180	19.64
+Database	Field	Symbols	Aircraft Manufacturer	992	53	18.72
+Database	Field	Symbols	Aircraft Manufacturer Country	197	14	14.07
+Database	Field	Symbols	Aircraft Name Full	5064	180	28.13
+Database	Field	Symbols	Aircraft Name Abbreviated	2216	178	12.45
+Database	Field	Symbols	Aircraft Begin Date	820	41	20.00
+Database	Field	Symbols	Aircraft End Date	6	1	6.00
+Database	Field	Symbols	Aircraft Age Classification	26	2	13.00
+Database	Field	Symbols	Aircraft Engine Type	58	4	14.50
+Database	Field	Symbols	Aircraft Number Of Engines	148	7	21.14
+Database	Field	Symbols	Distance Interval	468	22	21.27
+Database	Field	Symbols	Origin Airport	89202	2119	42.10
+Database	Field	Symbols	Destination Airport	91764	2180	42.09
+Database	Field	Symbols	Origin Market	39407	1860	21.19
+Database	Field	Symbols	Destination Market	40650	1918	21.19
+Database	Field	Symbols	Metric Name	57	3	19.00
+Database	Field	Symbols	eMetric	65	3	21.67
+State Space	Table State	Internal	Main Data	1258763
+State Space	Table State	Internal	Master Calendar	1065
+State Space	Table State	Internal	Carrier Groups	8
+State Space	Table State	Internal	Airlines	337
+State Space	Table State	Internal	Carrier Operating Region	8
+State Space	Table State	Internal	Flight Types	4
+State Space	Table State	Internal	Aircraft Types	180
+State Space	Table State	Internal	Distance Groups	22
+State Space	Table State	Internal	Origin Airports	2124
+State Space	Table State	Internal	Destination Airports	2185
+State Space	Table State	Internal	Origin Markets	1860
+State Space	Table State	Internal	Destination Markets	1918
+State Space	Table State	Internal	INLFED	3
+State Space	Table State	Internal	$$SysTable 13	106
+State Space	Table State	Internal	$$SysTable 14	13
+State Space	Table State	Internal	$$SysTable 15	95
+State Space	Field State	State	$Field	95	1	95
+State Space	Field State	Selection	$Field	0
+State Space	Field State	State	$Table	13	1	13
+State Space	Field State	Selection	$Table	0
+State Space	Field State	State	$Rows	12	1	12
+State Space	Field State	Selection	$Rows	0
+State Space	Field State	State	$Fields	4	1	4
+State Space	Field State	Selection	$Fields	0
+State Space	Field State	State	$FieldNo	68	1	68
+State Space	Field State	Selection	$FieldNo	0
+State Space	Field State	State	$Info	1	1	1
+State Space	Field State	Selection	$Info	0
+State Space	Field State	State	%Airline ID	338	1	338
+State Space	Field State	Selection	%Airline ID	0
+State Space	Field State	State	%Carrier Group ID	8	1	8
+State Space	Field State	Selection	%Carrier Group ID	0
+State Space	Field State	State	%Unique Carrier Code	338	1	338
+State Space	Field State	Selection	%Unique Carrier Code	0
+State Space	Field State	State	%Unique Carrier Entity Code	408	1	408
+State Space	Field State	Selection	%Unique Carrier Entity Code	0
+State Space	Field State	State	%Region Code	7	1	7
+State Space	Field State	Selection	%Region Code	0
+State Space	Field State	State	%Origin Airport ID	2124	1	2124
+State Space	Field State	Selection	%Origin Airport ID	0
+State Space	Field State	State	%Origin Airport Sequence ID	3340	1	3340
+State Space	Field State	Selection	%Origin Airport Sequence ID	0
+State Space	Field State	State	%Origin Airport Market ID	1859	1	1859
+State Space	Field State	Selection	%Origin Airport Market ID	0
+State Space	Field State	State	%Origin World Area Code	212	1	212
+State Space	Field State	Selection	%Origin World Area Code	0
+State Space	Field State	State	%Destination Airport ID	2185	1	2185
+State Space	Field State	Selection	%Destination Airport ID	0
+State Space	Field State	State	%Destination Airport Sequence ID	3435	1	3435
+State Space	Field State	Selection	%Destination Airport Sequence ID	0
+State Space	Field State	State	%Destination Airport Market ID	1917	1	1917
+State Space	Field State	Selection	%Destination Airport Market ID	0
+State Space	Field State	State	%Destination World Area Code	209	1	209
+State Space	Field State	Selection	%Destination World Area Code	0
+State Space	Field State	State	%Aircraft Group ID	9	1	9
+State Space	Field State	Selection	%Aircraft Group ID	0
+State Space	Field State	State	%Aircraft Type ID	180	1	180
+State Space	Field State	Selection	%Aircraft Type ID	384
+State Space	Field State	State	%Aircraft Configuration ID	4	1	4
+State Space	Field State	Selection	%Aircraft Configuration ID	0
+State Space	Field State	State	%Distance Group ID	22	1	22
+State Space	Field State	Selection	%Distance Group ID	0
+State Space	Field State	State	%Service Class ID	4	1	4
+State Space	Field State	Selection	%Service Class ID	0
+State Space	Field State	State	%Datasource ID	4	1	4
+State Space	Field State	Selection	%Datasource ID	0
+State Space	Field State	State	# Departures Scheduled	722	1	722
+State Space	Field State	Selection	# Departures Scheduled	512
+State Space	Field State	State	# Departures Performed	723	1	723
+State Space	Field State	Selection	# Departures Performed	512
+State Space	Field State	State	# Payload	238153	1	238153
+State Space	Field State	Selection	# Payload	0
+State Space	Field State	State	Distance	5025	1	5025
+State Space	Field State	Selection	Distance	34176
+State Space	Field State	State	# Available Seats	23065	1	23065
+State Space	Field State	Selection	# Available Seats	4352
+State Space	Field State	State	# Transported Passengers	26298	1	26298
+State Space	Field State	Selection	# Transported Passengers	0
+State Space	Field State	State	# Transported Freight	185470	1	185470
+State Space	Field State	Selection	# Transported Freight	0
+State Space	Field State	State	# Transported Mail	49457	1	49457
+State Space	Field State	Selection	# Transported Mail	0
+State Space	Field State	State	# Ramp-To-Ramp Time	33188	1	33188
+State Space	Field State	Selection	# Ramp-To-Ramp Time	0
+State Space	Field State	State	# Air Time	30255	1	30255
+State Space	Field State	Selection	# Air Time	4352
+State Space	Field State	State	Unique Carrier	343	1	343
+State Space	Field State	Selection	Unique Carrier	0
+State Space	Field State	State	Carrier Code	342	1	342
+State Space	Field State	Selection	Carrier Code	0
+State Space	Field State	State	Carrier Name	349	1	349
+State Space	Field State	Selection	Carrier Name	384
+State Space	Field State	State	Origin Airport Code	2126	1	2126
+State Space	Field State	Selection	Origin Airport Code	0
+State Space	Field State	State	Origin City	1919	1	1919
+State Space	Field State	Selection	Origin City	768
+State Space	Field State	State	Origin State Code	68	1	68
+State Space	Field State	Selection	Origin State Code	0
+State Space	Field State	State	Origin State FIPS	55	1	55
+State Space	Field State	Selection	Origin State FIPS	0
+State Space	Field State	State	Origin State	68	1	68
+State Space	Field State	Selection	Origin State	320
+State Space	Field State	State	Origin Country Code	146	1	146
+State Space	Field State	Selection	Origin Country Code	0
+State Space	Field State	State	Origin Country	146	1	146
+State Space	Field State	Selection	Origin Country	384
+State Space	Field State	State	Destination Airport Code	2188	1	2188
+State Space	Field State	Selection	Destination Airport Code	0
+State Space	Field State	State	Destination City	1982	1	1982
+State Space	Field State	Selection	Destination City	768
+State Space	Field State	State	Destination State Code	67	1	67
+State Space	Field State	Selection	Destination State Code	0
+State Space	Field State	State	Destination State FIPS	54	1	54
+State Space	Field State	Selection	Destination State FIPS	0
+State Space	Field State	State	Destination State	67	1	67
+State Space	Field State	Selection	Destination State	320
+State Space	Field State	State	Destination Country Code	144	1	144
+State Space	Field State	Selection	Destination Country Code	0
+State Space	Field State	State	Destination Country	144	1	144
+State Space	Field State	Selection	Destination Country	384
+State Space	Field State	State	Period	36	1	36
+State Space	Field State	Selection	Period	320
+State Space	Field State	State	From - To Airport Code	51212	1	51212
+State Space	Field State	Selection	From - To Airport Code	0
+State Space	Field State	State	From - To Airport ID	51209	1	51209
+State Space	Field State	Selection	From - To Airport ID	0
+State Space	Field State	State	From - To City	46665	1	46665
+State Space	Field State	Selection	From - To City	0
+State Space	Field State	State	From - To State Code	3027	1	3027
+State Space	Field State	Selection	From - To State Code	0
+State Space	Field State	State	From - To State	3027	1	3027
+State Space	Field State	Selection	From - To State	0
+State Space	Field State	State	# M-Delta Total Employees	414	1	414
+State Space	Field State	Selection	# M-Delta Total Employees	0
+State Space	Field State	State	# M-Delta Full Time Employees	373	1	373
+State Space	Field State	Selection	# M-Delta Full Time Employees	0
+State Space	Field State	State	# M-Delta Part Time Employees	248	1	248
+State Space	Field State	Selection	# M-Delta Part Time Employees	0
+State Space	Field State	State	# M-Delta Equivalent FTEs	395	1	395
+State Space	Field State	Selection	# M-Delta Equivalent FTEs	0
+State Space	Field State	State	# Q-Delta Total Employees	588	1	588
+State Space	Field State	Selection	# Q-Delta Total Employees	0
+State Space	Field State	State	# Q-Delta Full Time Employees	553	1	553
+State Space	Field State	Selection	# Q-Delta Full Time Employees	0
+State Space	Field State	State	# Q-Delta Part Time Employees	352	1	352
+State Space	Field State	Selection	# Q-Delta Part Time Employees	0
+State Space	Field State	State	# Q-Delta Equivalent FTEs	567	1	567
+State Space	Field State	Selection	# Q-Delta Equivalent FTEs	0
+State Space	Field State	State	# Y-Delta Total Employees	749	1	749
+State Space	Field State	Selection	# Y-Delta Total Employees	0
+State Space	Field State	State	# Y-Delta Full Time Employees	726	1	726
+State Space	Field State	Selection	# Y-Delta Full Time Employees	0
+State Space	Field State	State	# Y-Delta Part Time Employees	424	1	424
+State Space	Field State	Selection	# Y-Delta Part Time Employees	0
+State Space	Field State	State	# Y-Delta Equivalent FTEs	751	1	751
+State Space	Field State	Selection	# Y-Delta Equivalent FTEs	0
+State Space	Field State	State	# Total Employees	1741	1	1741
+State Space	Field State	Selection	# Total Employees	0
+State Space	Field State	State	# Full Time Employees	1709	1	1709
+State Space	Field State	Selection	# Full Time Employees	0
+State Space	Field State	State	# Part Time Employees	891	1	891
+State Space	Field State	Selection	# Part Time Employees	0
+State Space	Field State	State	# Equivalent FTEs	1730	1	1730
+State Space	Field State	Selection	# Equivalent FTEs	0
+State Space	Field State	State	Year	3	1	3
+State Space	Field State	Selection	Year	576
+State Space	Field State	State	Month	12	1	12
+State Space	Field State	Selection	Month	320
+State Space	Field State	State	Year - Month	36	1	36
+State Space	Field State	Selection	Year - Month	0
+State Space	Field State	State	Quarter	4	1	4
+State Space	Field State	Selection	Quarter	320
+State Space	Field State	State	QuarterID	12	1	12
+State Space	Field State	Selection	QuarterID	0
+State Space	Field State	State	PeriodID	36	1	36
+State Space	Field State	Selection	PeriodID	0
+State Space	Field State	State	Carrier Group	8	1	8
+State Space	Field State	Selection	Carrier Group	320
+State Space	Field State	State	Airline	337	1	337
+State Space	Field State	Selection	Airline	384
+State Space	Field State	State	Carrier's Operating Region	7	1	7
+State Space	Field State	Selection	Carrier's Operating Region	320
+State Space	Field State	State	Flight Type	4	1	4
+State Space	Field State	Selection	Flight Type	320
+State Space	Field State	State	Aircraft Name	180	1	180
+State Space	Field State	Selection	Aircraft Name	384
+State Space	Field State	State	Aircraft Manufacturer	53	1	53
+State Space	Field State	Selection	Aircraft Manufacturer	0
+State Space	Field State	State	Aircraft Manufacturer Country	14	1	14
+State Space	Field State	Selection	Aircraft Manufacturer Country	0
+State Space	Field State	State	Aircraft Name Full	180	1	180
+State Space	Field State	Selection	Aircraft Name Full	0
+State Space	Field State	State	Aircraft Name Abbreviated	178	1	178
+State Space	Field State	Selection	Aircraft Name Abbreviated	0
+State Space	Field State	State	Aircraft Begin Date	41	1	41
+State Space	Field State	Selection	Aircraft Begin Date	0
+State Space	Field State	State	Aircraft End Date	1	1	1
+State Space	Field State	Selection	Aircraft End Date	0
+State Space	Field State	State	Aircraft Age Classification	2	1	2
+State Space	Field State	Selection	Aircraft Age Classification	0
+State Space	Field State	State	Aircraft Engine Type	4	1	4
+State Space	Field State	Selection	Aircraft Engine Type	320
+State Space	Field State	State	Aircraft Number Of Engines	7	1	7
+State Space	Field State	Selection	Aircraft Number Of Engines	320
+State Space	Field State	State	Distance Interval	22	1	22
+State Space	Field State	Selection	Distance Interval	320
+State Space	Field State	State	Origin Airport	2119	1	2119
+State Space	Field State	Selection	Origin Airport	0
+State Space	Field State	State	Destination Airport	2180	1	2180
+State Space	Field State	Selection	Destination Airport	0
+State Space	Field State	State	Origin Market	1860	1	1860
+State Space	Field State	Selection	Origin Market	0
+State Space	Field State	State	Destination Market	1918	1	1918
+State Space	Field State	Selection	Destination Market	0
+State Space	Field State	State	Metric Name	3	1	3
+State Space	Field State	Selection	Metric Name	576
+State Space	Field State	State	eMetric	3	1	3
+State Space	Field State	Selection	eMetric	320

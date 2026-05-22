@@ -154,7 +154,7 @@ def process_unfiltered_fields_file(file_path, relevant_fields, logger, overwrite
         # Check if mapped file already exists
         if os.path.exists(output_path) and not overwrite_existing:
             logger.info(f"Skipped mapping for '{file_path}' because mapped file already exists.")
-            print(f"    ⏭️  Skipped (already mapped): {os.path.basename(output_path)}")
+            print(f"      Skipped (already mapped): {os.path.basename(output_path)}")
             return
 
         df = pd.read_csv(file_path)
@@ -175,14 +175,14 @@ def process_unfiltered_fields_file(file_path, relevant_fields, logger, overwrite
 
             pivot_df.to_csv(output_path, index=False)
             logger.info(f"Processed and pivoted: {output_path}")
-            print(f"    ✓ Saved: {os.path.basename(output_path)} ({len(filtered_columns)} fields)")
+            print(f"     Saved: {os.path.basename(output_path)} ({len(filtered_columns)} fields)")
         else:
             logger.warning(f"No data to process in: {file_path}")
-            print(f"    ⚠️  No relevant fields found in: {os.path.basename(file_path)}")
+            print(f"      No relevant fields found in: {os.path.basename(file_path)}")
 
     except Exception as e:
         logger.error(f"Error processing {file_path}: {e}")
-        print(f"    ❌ Error mapping {os.path.basename(file_path)}: {e}")
+        print(f"     Error mapping {os.path.basename(file_path)}: {e}")
 
 def generate_outputanalysis_jsons(report_folder: Path, logger, field_mapping: Path):
     logger.info("Starting structured JSON generation from QVW metadata...")
@@ -208,10 +208,10 @@ def generate_outputanalysis_jsons(report_folder: Path, logger, field_mapping: Pa
             if key in dfs:
                 dfs[key].columns = dfs[key].columns.str.strip()
                 logger.info(f"Loaded {key} with {dfs[key].shape[0]} rows and columns: {list(dfs[key].columns)}")
-                print(f"      ✓ Found: {path.name}")
+                print(f"       Found: {path.name}")
             else:
                 logger.warning(f"Missing: {path} — skipping dependent outputs")
-                print(f"      ⚠️  Missing: {path.name} (skipping dependent outputs)")
+                print(f"        Missing: {path.name} (skipping dependent outputs)")
 
         output_dir = report_folder / "Outputanalysis"
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -235,7 +235,7 @@ def generate_outputanalysis_jsons(report_folder: Path, logger, field_mapping: Pa
                 enriched["BaseFileName"] = enriched["ObjectId"].str[:2]
                 enriched = enriched.merge(object_pbi_type_map, on="BaseFileName", how="left")
             else:
-                print(f"      ⚠️  field_mapping.csv missing — skipping PBI type mapping")
+                print(f"        field_mapping.csv missing — skipping PBI type mapping")
                 enriched["ObjectType_y"] = ""
                 enriched["PowerBIObjectType"] = ""
 
@@ -245,7 +245,7 @@ def generate_outputanalysis_jsons(report_folder: Path, logger, field_mapping: Pa
                     dax_cols = [c for c in ["Expression", "DAX", "ExpressionComment"] if c in dax_df.columns]
                     merged_exprs = expressions_df.merge(dax_df[dax_cols], on="Expression", how="left").fillna("")
                 else:
-                    print(f"      ⚠️  expressions_with_dax.csv missing — expressions without DAX translations")
+                    print(f"        expressions_with_dax.csv missing — expressions without DAX translations")
                     merged_exprs = expressions_df.copy()
                     merged_exprs["DAX"] = ""
 
@@ -269,7 +269,7 @@ def generate_outputanalysis_jsons(report_folder: Path, logger, field_mapping: Pa
             })
         else:
             missing = [n for n, d in [("objects.csv", objects_df), ("objectSheets.csv", object_sheets_df), ("sheets.csv", sheets_df)] if d is None]
-            print(f"      ⚠️  Cannot build enriched objects — missing: {', '.join(missing)}")
+            print(f"        Cannot build enriched objects — missing: {', '.join(missing)}")
 
         # Save enriched_dax.json (objects that have DAX expressions)
         if enriched_final is not None:
@@ -289,7 +289,7 @@ def generate_outputanalysis_jsons(report_folder: Path, logger, field_mapping: Pa
             output_path = output_dir / "enriched_dax.json"
             with open(output_path, "w", encoding="utf-8") as f:
                 json.dump(enriched_with_dax.to_dict(orient="records"), f, indent=2, ensure_ascii=False)
-            print(f"      ✓ Saved: enriched_dax.json ({len(enriched_with_dax)} objects)")
+            print(f"       Saved: enriched_dax.json ({len(enriched_with_dax)} objects)")
 
         # Save m_query_output.json
         if "m_query" in dfs:
@@ -299,7 +299,7 @@ def generate_outputanalysis_jsons(report_folder: Path, logger, field_mapping: Pa
             with open(output_dir / "m_query_output.json", "w", encoding="utf-8") as f:
                 json.dump(m_query_output, f, indent=2, ensure_ascii=False)
             logger.info(f"Saved m_query_output.json with {len(m_query_output)} entries")
-            print(f"      ✓ Saved: m_query_output.json ({len(m_query_output)} tables)")
+            print(f"       Saved: m_query_output.json ({len(m_query_output)} tables)")
 
         # Save report_pages.json
         report_pages_dir = report_folder / "ReportPages"
@@ -309,12 +309,12 @@ def generate_outputanalysis_jsons(report_folder: Path, logger, field_mapping: Pa
                 with open(output_dir / "report_pages.json", "w", encoding="utf-8") as f:
                     json.dump(images, f, indent=2)
                 logger.info(f"Saved report_pages.json with {len(images)} images")
-                print(f"      ✓ Saved: report_pages.json ({len(images)} images)")
+                print(f"       Saved: report_pages.json ({len(images)} images)")
             else:
-                print(f"      ⚠️  ReportPages/ exists but contains no PNG files")
+                print(f"        ReportPages/ exists but contains no PNG files")
         else:
-            print(f"      ⚠️  ReportPages/ not found — run PDF Generation (Step 6) first")
+            print(f"        ReportPages/ not found — run PDF Generation (Step 6) first")
 
     except Exception as e:
         logger.exception(f"Failed to generate structured JSON output for {report_folder.name}: {str(e)}")
-        print(f"      ❌ Output analysis failed: {e}")
+        print(f"       Output analysis failed: {e}")

@@ -69,7 +69,7 @@ def get_closest_example(tab_code, client, rag_index, top_k=1, similarity_thresho
 
     for entry in rag_index:
         score = cosine_similarity(new_embedding, entry["embedding"])
-        print(f"→ Similarity to '{entry['tab_name']}': {score:.4f}")
+        print(f" Similarity to '{entry['tab_name']}': {score:.4f}")
         scored.append((score, entry))
 
     scored.sort(key=lambda x: x[0], reverse=True)
@@ -282,10 +282,10 @@ def save_m_query_to_csv(output_rows, qvs_file_path, logger):
             writer.writeheader()
             writer.writerows(output_rows)
         logger.info(f"M Query scripts saved to CSV at '{output_csv_path}'")
-        print(f"    ✓ Saved: m_query_output.csv ({len(output_rows)} tables) → {output_csv_path}")
+        print(f"     Saved: m_query_output.csv ({len(output_rows)} tables)  {output_csv_path}")
     except Exception as e:
         logger.error(f"Error saving CSV: {e}")
-        print(f"    ❌ Error saving m_query_output.csv: {e}")
+        print(f"     Error saving m_query_output.csv: {e}")
         raise
 
 # ===========================================
@@ -512,7 +512,7 @@ def generate_dax(model_name, client, all_qlik_expressions, logger, overwrite_exi
         if start_file:
             start_file(report_name)
 
-        print(f"\n→ [{report_name}] Translating expressions → DAX")
+        print(f"\n [{report_name}] Translating expressions  DAX")
 
         try:
             output_csv_path = file_path.replace("expressions.csv", "expressions_with_dax.csv")
@@ -523,7 +523,7 @@ def generate_dax(model_name, client, all_qlik_expressions, logger, overwrite_exi
                 if end_file:
                     end_file(report_name, "skipped")
                 logger.info(f"Skipped DAX generation for {file_path} (outputs already exist).")
-                print(f"  ⏭️  Skipping — expressions_with_dax.csv + DAX_output.csv already exist")
+                print(f"    Skipping — expressions_with_dax.csv + DAX_output.csv already exist")
                 continue
 
             #Case 2: Overwrite
@@ -536,7 +536,7 @@ def generate_dax(model_name, client, all_qlik_expressions, logger, overwrite_exi
             if len(rows) < 2:
                 if end_file:
                     end_file(report_name, "skipped")
-                print(f"  ⏭️  Skipping — expressions.csv has no data rows")
+                print(f"    Skipping — expressions.csv has no data rows")
                 continue
             header = rows[0]
             data_rows = rows[1:]
@@ -547,7 +547,7 @@ def generate_dax(model_name, client, all_qlik_expressions, logger, overwrite_exi
             fields_content = obtain_semantic_model(fields_path)
             #fields_content = read_file(fields_path, "utf-16", logger)
             if not fields_content:
-                print(f"  ❌ Missing fields.csv for {file_path}")
+                print(f"   Missing fields.csv for {file_path}")
                 if end_file:
                     end_file(report_name, "failed")
                 continue
@@ -615,7 +615,7 @@ def generate_dax(model_name, client, all_qlik_expressions, logger, overwrite_exi
                 writer = csv.writer(f, quoting=csv.QUOTE_ALL)
                 writer.writerow(updated_header)
                 writer.writerows(updated_rows)
-            print(f"  ✓ Saved: expressions_with_dax.csv ({len(updated_rows)} rows)")
+            print(f"   Saved: expressions_with_dax.csv ({len(updated_rows)} rows)")
 
             # Write DAX_output.csv
             dax_output_path = os.path.join(os.path.dirname(file_path), "DAX_output.csv")
@@ -623,15 +623,15 @@ def generate_dax(model_name, client, all_qlik_expressions, logger, overwrite_exi
                 writer = csv.writer(f, quoting=csv.QUOTE_ALL)
                 for response in all_dax_responses:
                     writer.writerow([response.strip()])
-            print(f"  ✓ Saved: DAX_output.csv")
-            print(f"  ✅ [{report_name}] DAX translation done")
+            print(f"   Saved: DAX_output.csv")
+            print(f"   [{report_name}] DAX translation done")
 
             if end_file:
                 end_file(report_name, "success")
 
         except Exception as e:
             logger.error(f"[ERROR] Failed processing {file_path}: {e}", exc_info=True)
-            print(f"  ❌ [{report_name}] DAX translation failed: {e}")
+            print(f"   [{report_name}] DAX translation failed: {e}")
             if end_file:
                 end_file(report_name, "failed")
             raise

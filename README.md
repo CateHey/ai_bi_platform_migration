@@ -104,6 +104,8 @@ Powershell: .venv/Scripts/activate
 CMD: set PYTHONPATH=.
 
 streamlit run src/app.py
+streamlit run app.py
+
 ```
 
 ## Troubleshooting
