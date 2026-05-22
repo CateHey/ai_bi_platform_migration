@@ -1,0 +1,34 @@
+[
+  {
+    "TableName": "MainData",
+    "MQueryScript": "let  \r\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Flight Data.qvd\")),  \r\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),  \r\n    ChangedType = Table.TransformColumnTypes(PromotedHeaders, {  \r\n        {\"%Airline ID\", Int64.Type},  \r\n        {\"%Carrier Group ID\", Int64.Type},  \r\n        {\"%Unique Carrier Code\", Text.Type},  \r\n        {\"%Unique Carrier Entity Code\", Text.Type},  \r\n        {\"%Region Code\", Text.Type},  \r\n        {\"%Origin Airport ID\", Int64.Type},  \r\n        {\"%Origin Airport Sequence ID\", Int64.Type},  \r\n        {\"%Origin Airport Market ID\", Int64.Type},  \r\n        {\"%Origin World Area Code\", Int64.Type},  \r\n        {\"%Destination Airport ID\", Int64.Type},  \r\n        {\"%Destination Airport Sequence ID\", Int64.Type},  \r\n        {\"%Destination Airport Market ID\", Int64.Type},  \r\n        {\"%Destination World Area Code\", Int64.Type},  \r\n        {\"%Aircraft Group ID\", Int64.Type},  \r\n        {\"%Aircraft Type ID\", Int64.Type},  \r\n        {\"%Aircraft Configuration ID\", Int64.Type},  \r\n        {\"%Distance Group ID\", Int64.Type},  \r\n        {\"%Service Class ID\", Int64.Type},  \r\n        {\"%Datasource ID\", Int64.Type},  \r\n        {\"# Departures Scheduled\", Int64.Type},  \r\n        {\"# Departures Performed\", Int64.Type},  \r\n        {\"# Payload\", Int64.Type},  \r\n        {\"Distance\", Int64.Type},  \r\n        {\"# Available Seats\", Int64.Type},  \r\n        {\"# Transported Passengers\", Int64.Type},  \r\n        {\"# Transported Freight\", Int64.Type},  \r\n        {\"# Transported Mail\", Int64.Type},  \r\n        {\"# Ramp-To-Ramp Time\", Int64.Type},  \r\n        {\"# Air Time\", Int64.Type},  \r\n        {\"Unique Carrier\", Text.Type},  \r\n        {\"Carrier Code\", Text.Type},  \r\n        {\"Carrier Name\", Text.Type},  \r\n        {\"Origin Airport Code\", Text.Type},  \r\n        {\"Origin City\", Text.Type},  \r\n        {\"Origin State Code\", Text.Type},  \r\n        {\"Origin State FIPS\", Int64.Type},  \r\n        {\"Origin State\", Text.Type},  \r\n        {\"Origin Country Code\", Text.Type},  \r\n        {\"Origin Country\", Text.Type},  \r\n        {\"Destination Airport Code\", Text.Type},  \r\n        {\"Destination City\", Text.Type},  \r\n        {\"Destination State Code\", Text.Type},  \r\n        {\"Destination State FIPS\", Int64.Type},  \r\n        {\"Destination State\", Text.Type},  \r\n        {\"Destination Country Code\", Text.Type},  \r\n        {\"Destination Country\", Text.Type},  \r\n        {\"Year\", Int64.Type},  \r\n        {\"Period\", Int64.Type},  \r\n        {\"Quarter\", Int64.Type},  \r\n        {\"Month (#)\", Int64.Type},  \r\n        {\"Month\", Text.Type},  \r\n        {\"From - To Airport Code\", Text.Type},  \r\n        {\"From - To Airport ID\", Int64.Type},  \r\n        {\"From - To City\", Text.Type},  \r\n        {\"From - To State Code\", Text.Type},  \r\n        {\"From - To State\", Text.Type}  \r\n    })  \r\nin  \r\n    ChangedType"
+  },
+  {
+    "TableName": "CarrierGroups",
+    "MQueryScript": "let\r\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Carrier Groups.qvd\")),\r\n    CarrierGroups = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\r\nin\r\n    CarrierGroups"
+  },
+  {
+    "TableName": "Airlines",
+    "MQueryScript": "let\r\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Airlines.qvd\")),\r\n    Airlines = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\r\nin\r\n    Airlines"
+  },
+  {
+    "TableName": "CarrierOperatingRegion",
+    "MQueryScript": "let\r\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Carrier Operating Region.qvd\")),\r\n    CarrierOperatingRegion = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\r\nin\r\n    CarrierOperatingRegion"
+  },
+  {
+    "TableName": "FlightTypes",
+    "MQueryScript": "let\r\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Flight Types.qvd\")),\r\n    FlightTypes = Table.PromoteHeaders(Source, [PromoteAllScalars=true])\r\nin\r\n    FlightTypes"
+  },
+  {
+    "TableName": "AircraftGroups",
+    "MQueryScript": "let  \r\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Aircraft Groups.qvd\")),  \r\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),  \r\n    RenamedColumns = Table.RenameColumns(PromotedHeaders, {{\"%Aircraft Group ID\", \"Aircraft Group ID\"}, {\"Aircraft Group\", \"Aircraft Group\"}})  \r\nin  \r\n    RenamedColumns"
+  },
+  {
+    "TableName": "AircraftTypes",
+    "MQueryScript": "let  \r\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Aircraft Types.qvd\")),  \r\n    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),  \r\n    RenamedColumns = Table.RenameColumns(PromotedHeaders, {{\"%Aircraft Type ID\", \"Aircraft Type ID\"}, {\"Aircraft Type\", \"Aircraft Type\"}})  \r\nin  \r\n    RenamedColumns"
+  },
+  {
+    "TableName": "DistanceGroups",
+    "MQueryScript": "let\r\n    Source = Qvd.Document(File.Contents(\"..\\Data Files\\QVDs\\Distance Groups.qvd\")),\r\n    DistanceGroups = Source{[Name = \"Table\"]}[Content],\r\n    PromotedHeaders = Table.PromoteHeaders(DistanceGroups, [PromoteAllScalars = true]),\r\n    RenamedColumns = Table.RenameColumns(PromotedHeaders, {{\"%Distance Group ID\", \"Distance Group ID\"}, {\"Distance Interval\", \"Distance Interval\"}})\r\nin\r\n    RenamedColumns"
+  }
+]

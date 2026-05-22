@@ -1,0 +1,86 @@
+[
+  {
+    "ObjectId": "CH01",
+    "Object Name": "Traffic per Year",
+    "SheetId": "SH02",
+    "Sheet Name": "Dashboard",
+    "Object Type QlikView": "Chart",
+    "Object Type Power BI Equivalent": "Visualization",
+    "Associated Expressions": [
+      {
+        "Expression": "Sum ([# Departures Performed])",
+        "DAX": "'# of Flights' = SUM('Main Data'[# Departures Performed])\n"
+      },
+      {
+        "Expression": "Sum ([# Departures Performed])",
+        "DAX": "'Total Departures Performed' = SUM('Main Data'[# Departures Performed])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Passengers])",
+        "DAX": "'# of Enplanned Passengers' = SUM('Main Data'[# Transported Passengers])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Passengers])",
+        "DAX": "'Total Transported Passengers' = SUM('Main Data'[# Transported Passengers])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Freight])",
+        "DAX": "'Total Transported Freight' = SUM('Main Data'[# Transported Freight])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Freight])",
+        "DAX": "'Total Transported Freight' = SUM('Main Data'[# Transported Freight])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Mail])",
+        "DAX": "'Total Transported Mail' = SUM('Main Data'[# Transported Mail])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Mail])",
+        "DAX": "'Total Transported Mail' = SUM('Main Data'[# Transported Mail])\n"
+      }
+    ]
+  },
+  {
+    "ObjectId": "CH02",
+    "Object Name": "Top 10 Routes",
+    "SheetId": "SH02",
+    "Sheet Name": "Dashboard",
+    "Object Type QlikView": "Chart",
+    "Object Type Power BI Equivalent": "Visualization",
+    "Associated Expressions": [
+      {
+        "Expression": "Sum ([# Departures Performed])",
+        "DAX": "'# of Flights' = SUM('Main Data'[# Departures Performed])\n"
+      },
+      {
+        "Expression": "Sum ([# Departures Performed])",
+        "DAX": "'Total Departures Performed' = SUM('Main Data'[# Departures Performed])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Passengers])",
+        "DAX": "'# of Enplanned Passengers' = SUM('Main Data'[# Transported Passengers])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Passengers])",
+        "DAX": "'Total Transported Passengers' = SUM('Main Data'[# Transported Passengers])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Freight])",
+        "DAX": "'Total Transported Freight' = SUM('Main Data'[# Transported Freight])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Freight])",
+        "DAX": "'Total Transported Freight' = SUM('Main Data'[# Transported Freight])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Mail])",
+        "DAX": "'Total Transported Mail' = SUM('Main Data'[# Transported Mail])\n"
+      },
+      {
+        "Expression": "Sum ([# Transported Mail])",
+        "DAX": "'Total Transported Mail' = SUM('Main Data'[# Transported Mail])\n"
+      }
+    ]
+  }
+]
